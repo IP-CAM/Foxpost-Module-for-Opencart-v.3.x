@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Rausch Foxpost</name>
+    <version>1.0</version>
+    <author>Rausch Richard</author>
+    <link>http://www.rausch.hu</link>
+    <code>rausch_foxpost</code>
+    <file path="admin/controller/extension/shipping/foxpost.php">
+        <operation>
+            <search><![CDATA[ $this->load->model('localisation/order_status'); ]]></search>
+            <add position="before"><![CDATA[ 
+            $this->load->model('localisation/tax_class');
+		    $data['tax_classes'] = $this->model_localisation_tax_class->getTaxClasses();
+            if (isset($this->request->post['shipping_foxpost_tax_class_id'])) {
+                $data['shipping_foxpost_tax_class_id'] = $this->request->post['shipping_foxpost_tax_class_id'];
+            } else {
+                $data['shipping_foxpost_tax_class_id'] = $this->config->get('shipping_foxpost_tax_class_id');
+            }           
+        ]]></add>
+        </operation>
+    </file>
+    <file path="admin/language/*/extension/shipping/foxpost.php">
+        <operation>
+            <search><![CDATA[ <?php ]]></search>
+            <add position="after"><![CDATA[ 
+                $_['entry_tax_class']   = 'Adónem';     
+        ]]></add>
+        </operation>
+    </file>
+    <file path="admin/view/template/extension/shipping/foxpost_settings.twig">
+        <operation>
+            <search trim="true" index="0"><![CDATA[ <div class="panel-body">]]></search>
+            <add position="after"><![CDATA[ 
+            <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-tax-class">{{ entry_tax_class }}</label>
+                            <div class="col-sm-10">
+                              <select name="shipping_foxpost_tax_class_id" id="input-tax-class" class="form-control">
+                                <option value="0">{{ text_none }}</option>
+                                {% for tax_class in tax_classes %}
+                                {% if tax_class.tax_class_id == shipping_foxpost_tax_class_id %}
+                                <option value="{{ tax_class.tax_class_id }}" selected="selected">{{ tax_class.title }}</option>
+                                {% else %}
+                                <option value="{{ tax_class.tax_class_id }}">{{ tax_class.title }}</option>
+                                {% endif %}
+                                {% endfor %}
+                              </select>
+                            </div>
+                        </div>                
+        ]]></add>
+        </operation>
+    </file>
+    <file path="catalog/model/extension/shipping/foxpost.php">
+        <operation>
+            <search><![CDATA[ 'tax_class_id' => "0",]]></search>
+            <add position="replace"><![CDATA[ 
+                'tax_class_id' => $this->config->get('shipping_foxpost_tax_class_id'),            
+        ]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[$_apm_cost         = $this->currency->format($apm_cost, $this->session->data['currency']);]]></search>
+            <add position="replace"><![CDATA[ 
+                $_apm_cost = $this->currency->format($this->tax->calculate($apm_cost, $this->config->get('shipping_foxpost_tax_class_id'), $this->config->get('config_tax')), $this->session->data['currency']);          
+        ]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[$_apmcod_cost      = $this->currency->format($apmcod_cost, $this->session->data['currency']);]]></search>
+            <add position="replace"><![CDATA[ 
+                $_apmcod_cost = $this->currency->format($this->tax->calculate($apmcod_cost, $this->config->get('shipping_foxpost_tax_class_id'), $this->config->get('config_tax')), $this->session->data['currency']);
+        ]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[$_transfer_cost    = $this->currency->format($transfer_cost, $this->session->data['currency']);]]></search>
+            <add position="replace"><![CDATA[ 
+                $_transfer_cost = $this->currency->format($this->tax->calculate($transfer_cost, $this->config->get('shipping_foxpost_tax_class_id'), $this->config->get('config_tax')), $this->session->data['currency']);
+        ]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[$_transfercod_cost = $this->currency->format($transfercod_cost, $this->session->data['currency']);]]></search>
+            <add position="replace"><![CDATA[ 
+                $_transfercod_cost = $this->currency->format($this->tax->calculate($transfercod_cost, $this->config->get('shipping_foxpost_tax_class_id'), $this->config->get('config_tax')), $this->session->data['currency']);
+        ]]></add>
+        </operation>
+    </file>
+    
+</modification>
