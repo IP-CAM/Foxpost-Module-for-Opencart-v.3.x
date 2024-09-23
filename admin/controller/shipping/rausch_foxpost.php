@@ -710,8 +710,12 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
 
     public function install(): void {
         $this->uninstall();
+        $this->load->model('setting/event');
         $this->load->model('extension/rausch_foxpost/shipping/rausch_foxpost');
         $this->model_extension_rausch_foxpost_shipping_rausch_foxpost->install();
+        
+        // Remove Event
+        $this->model_setting_event->deleteEventByCode('rausch_foxpost_adminmenu');
         
         // Add Event
         if (VERSION >= '4.0.2.0') {
@@ -750,6 +754,9 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $this->load->model('extension/rausch_foxpost/shipping/rausch_foxpost');
 
             $this->model_extension_rausch_foxpost_shipping_rausch_foxpost->uninstall();
+            $this->load->model('setting/event');
+            // Remove Event
+            $this->model_setting_event->deleteEventByCode('rausch_foxpost_adminmenu');
         }
     }
     
@@ -761,22 +768,20 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
     public function AddtoAdminMenu(&$route, &$data){
         
         if ($this->user->hasPermission('access', 'extension/rausch_foxpost/module/rausch_foxpost')) {  
-            
             $uj_menu = array();
             $this->load->language('extension/rausch_foxpost/module/rausch_foxpost');
-            
             $link = [];
             $link[] = [
-                    'name'	   => $this->language->get('text_list'),
-                    'href'     => $this->url->link('extension/rausch_foxpost/module/rausch_foxpost', 'user_token=' . $this->session->data['user_token'], true),
-                    'children' => []
+                    'name'      => $this->language->get('text_list'),
+                    'href'      => $this->url->link('extension/rausch_foxpost/module/rausch_foxpost', 'user_token=' . $this->session->data['user_token'], true),
+                    'children'  => []
             ];
 
             foreach ($data['menus'] as $key => $menu) {             
                 $uj_menu[] = $menu;
                 if ($key == 0) {
                     $uj_menu[] = [
-                        'id' => 'menu-allconnect',
+                        'id' => 'menu-rausch-foxpost',
                         'icon' => 'fa fa-plug',
                         'name' => $this->language->get('text_admin_menu'),
                         'href' => '',
