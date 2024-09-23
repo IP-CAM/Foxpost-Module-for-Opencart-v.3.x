@@ -15,6 +15,7 @@ $_['text_settings']                            = 'Foxpost settings';
 $_['text_payment_extensions']                  = 'Payment extensions';
 
 $_['text_test']                                = 'Test server';
+$_['text_list']                                = 'Foxpost';
 $_['text_shipping_settings']                   = 'Shipping settings';
 $_['text_shipping_surcharge']                  = 'Surcharge';
 $_['text_shipping_freelimit']                  = 'Free limit';

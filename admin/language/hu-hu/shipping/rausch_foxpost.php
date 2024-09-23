@@ -13,6 +13,7 @@ $_['text_settings']                            = 'Foxpost beállítások';
 $_['text_payment_extensions']                  = 'Payment extensions';
 
 $_['text_test']                                = 'Teszt szerver';
+$_['text_list']                                = 'Foxpost';
 $_['text_shipping_settings']                   = 'Szállítási beállítások';
 $_['text_shipping_surcharge']                  = 'Surcharge';
 $_['text_shipping_freelimit']                  = 'Ingyenes limit';
