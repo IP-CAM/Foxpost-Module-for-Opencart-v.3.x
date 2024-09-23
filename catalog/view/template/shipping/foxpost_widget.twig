@@ -1,0 +1,122 @@
+</label>
+
+<div id="foxpostmap" style="display: none; padding-top: 10px;">
+    <div class="panel panel-default">
+        <div class="panel-body" style="padding: 0;">
+            <iframe  frameborder="0" loading="lazy" src="https://cdn.foxpost.hu/apt-finder/v1/app/?lang={{ lang=='hu-hu'?'hu':'en' }}" width="100%" height="600px"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var apmradio    = '';
+    var apmcodradio = '';
+    var apm_type    = '';
+
+    function foxpost_preinit() {
+
+        if (!($('input[value="foxpost.apm"]').length == 0 && $('input[value="foxpost.apmcod"]').length == 0)) {
+
+            apmradio    = $('input[value="foxpost.apm"]');
+            apmcodradio = $('input[value="foxpost.apmcod"]');
+
+            $('.modal-dialog').css('width', '100%');
+            $('.modal-dialog').css('max-width', '1000px');
+
+            $('input[value="foxpost.transfer"]').on('click', function() {
+                foxpost_init('transfer');
+            })
+
+            $('input[value="foxpost.transfercod"]').on('click', function() {
+                foxpost_init('transfercod');
+            })
+
+            $('input[value="foxpost.apm"]').on('click', function() {
+                foxpost_init('apm');
+            })
+
+            $('input[value="foxpost.apmcod"]').on('click', function() {
+                foxpost_init('apmcod');
+            })
+
+            $(apmradio   ).prop('value', '');
+            $(apmcodradio).prop('value', '');
+
+            setTimeout( function() {
+                $('#removethislabel').remove();
+
+                $('[value^="foxpost.hu"]').each( function(index, item) {
+                    $(item).closest('div.radio').remove();
+                })
+
+                if ('{{ shipping_method_code|split('.')[0] }}' == 'foxpost') {
+
+                    $(apmradio).prop(   'value', "{{ shipping_method_code_apm }}");
+                    $(apmradio).closest('label').find('input').get(0).nextSibling.remove();
+                    $(apmradio).closest('label').append("{{ text_foxpost_apm }} ({{ (shipping_method_title|split('('))[1] }} - {{ _apm_cost }}");
+
+                    $(apmcodradio).prop(   'value', "{{ shipping_method_code_apmcod }}");
+                    $(apmcodradio).closest('label').find('input').get(0).nextSibling.remove();
+                    $(apmcodradio).closest('label').append("{{ text_foxpost_apmcod }} ({{ (shipping_method_title|split('('))[1] }} - {{ _apmcod_cost }}");
+
+                    if ('{{ shipping_method_code_type }}' == 'cod') {
+                        apm_type = 'cod';
+                        $(apmcodradio).attr('checked', true);
+                        foxpost_init('apmcod');
+                    }
+                    else if ('{{ shipping_method_code }}') {
+                        $(apmradio).attr('checked', true);
+                        foxpost_init('apm');
+                    }
+
+                }
+
+            }, 50);
+        }
+    }
+
+    function foxpost_init(type) {
+        if (type == 'apm') {
+            $('#foxpostmap').css('display', 'block');
+        }
+        else if (type == 'apmcod') {
+            apm_type = 'cod';
+            $('#foxpostmap').css('display', 'block');
+        }
+        else {
+            $('#foxpostmap').css('display', 'none');
+        }
+    }
+    
+    function receiveMessage(event) {
+        var apt = JSON.parse(event.data);
+
+        $(apmcodradio).closest('label').append("{{ text_foxpost_apmcod }}" + " (" + apt.name + ") - " + "{{ _apmcod_cost }}");
+
+        if (typeof $(apmcodradio).closest('label').find('input').get(0) != 'undefined') {
+            $(apmcodradio).closest('label').find('input').get(0).nextSibling.remove();
+        }
+        $(apmcodradio).prop('value', "foxpost." + apt.operator_id + '_cod');
+
+        $(apmradio).closest('label').append("{{ text_foxpost_apm }}" + " (" + apt.name + ") - " + "{{ _apm_cost }}");
+        if (typeof $(apmradio).closest('label').find('input').get(0) != 'undefined') {
+            $(apmradio).closest('label').find('input').get(0).nextSibling.remove();
+        }
+        $(apmradio).prop('value', "foxpost."+apt.operator_id);
+    }
+
+    var foxpostwatchdog = setInterval( function() {
+
+        if ($('[value^="foxpost."]').length > 10) {
+            foxpost_preinit();
+        }
+    }, 100);
+
+    window.addEventListener('message', receiveMessage, false);
+
+    foxpost_preinit();
+
+</script>
+
+<label id="removethislabel">
