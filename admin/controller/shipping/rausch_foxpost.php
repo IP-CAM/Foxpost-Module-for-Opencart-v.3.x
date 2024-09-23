@@ -754,6 +754,11 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $this->load->model('extension/rausch_foxpost/shipping/rausch_foxpost');
 
             $this->model_extension_rausch_foxpost_shipping_rausch_foxpost->uninstall();
+            // Permission
+            $this->load->model('user/user_group');
+            $this->model_user_user_group->removePermission($this->user->getGroupId(), 'access', 'extension/rausch_foxpost/module/rausch_foxpost');
+            $this->model_user_user_group->removePermission($this->user->getGroupId(), 'modify', 'extension/rausch_foxpost/module/rausch_foxpost');
+            
             $this->load->model('setting/event');
             // Remove Event
             $this->model_setting_event->deleteEventByCode('rausch_foxpost_adminmenu');
