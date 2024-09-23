@@ -723,7 +723,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 'code' => 'rausch_foxpost_adminmenu',
                 'description' => 'Admin Menu',
                 'trigger' => 'admin/view/common/column_left/before',
-                'action' => 'extension/rausch_foxpost/module/rausch_foxpost.AddtoAdminMenu',
+                'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost.AddtoAdminMenu',
                 'status' => 1,
                 'sort_order' => 0
             ]);
@@ -732,21 +732,21 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 'code' => 'rausch_foxpost_adminmenu',
                 'description' => 'Addon - Showmenu',
                 'trigger' => 'admin/view/common/column_left/before',
-                'action' => 'extension/rausch_foxpost/module/rausch_foxpost|AddtoAdminMenu',
+                'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost|AddtoAdminMenu',
                 'status' => 1,
                 'sort_order' => 0
             ]);
         } else {
-            $this->model_setting_event->addEvent('rausch_foxpost_adminmenu', 'Admin Menu', 'admin/view/common/column_left/before', 'extension/rausch_foxpost/module/rausch_foxpost|AddtoAdminMenu', 1, 0);
+            $this->model_setting_event->addEvent('rausch_foxpost_adminmenu', 'Admin Menu', 'admin/view/common/column_left/before', 'extension/rausch_foxpost/shipping/rausch_foxpost|AddtoAdminMenu', 1, 0);
         }
         
         // Permission
         $this->load->model('user/user_group');
-        $this->model_user_user_group->removePermission($this->user->getGroupId(), 'access', 'extension/rausch_foxpost/module/rausch_foxpost');
-        $this->model_user_user_group->removePermission($this->user->getGroupId(), 'modify', 'extension/rausch_foxpost/module/rausch_foxpost');
+        $this->model_user_user_group->removePermission($this->user->getGroupId(), 'access', 'extension/rausch_foxpost/shipping/rausch_foxpost');
+        $this->model_user_user_group->removePermission($this->user->getGroupId(), 'modify', 'extension/rausch_foxpost/shipping/rausch_foxpost');
 
-        $this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'extension/rausch_foxpost/module/rausch_foxpost');
-        $this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'extension/rausch_foxpost/module/rausch_foxpost');
+        $this->model_user_user_group->addPermission($this->user->getGroupId(), 'access', 'extension/rausch_foxpost/shipping/rausch_foxpost');
+        $this->model_user_user_group->addPermission($this->user->getGroupId(), 'modify', 'extension/rausch_foxpost/shipping/rausch_foxpost');
     }
 
     public function uninstall(): void {
@@ -756,8 +756,8 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $this->model_extension_rausch_foxpost_shipping_rausch_foxpost->uninstall();
             // Permission
             $this->load->model('user/user_group');
-            $this->model_user_user_group->removePermission($this->user->getGroupId(), 'access', 'extension/rausch_foxpost/module/rausch_foxpost');
-            $this->model_user_user_group->removePermission($this->user->getGroupId(), 'modify', 'extension/rausch_foxpost/module/rausch_foxpost');
+            $this->model_user_user_group->removePermission($this->user->getGroupId(), 'access', 'extension/rausch_foxpost/shipping/rausch_foxpost');
+            $this->model_user_user_group->removePermission($this->user->getGroupId(), 'modify', 'extension/rausch_foxpost/shipping/rausch_foxpost');
             
             $this->load->model('setting/event');
             // Remove Event
@@ -772,13 +772,13 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
      */
     public function AddtoAdminMenu(&$route, &$data){
         
-        if ($this->user->hasPermission('access', 'extension/rausch_foxpost/module/rausch_foxpost')) {  
+        if ($this->user->hasPermission('access', 'extension/rausch_foxpost/shipping/rausch_foxpost')) {  
             $uj_menu = array();
-            $this->load->language('extension/rausch_foxpost/module/rausch_foxpost');
+            $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
             $link = [];
             $link[] = [
                     'name'      => $this->language->get('text_list'),
-                    'href'      => $this->url->link('extension/rausch_foxpost/module/rausch_foxpost', 'user_token=' . $this->session->data['user_token'], true),
+                    'href'      => $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost', 'user_token=' . $this->session->data['user_token'], true),
                     'children'  => []
             ];
 
