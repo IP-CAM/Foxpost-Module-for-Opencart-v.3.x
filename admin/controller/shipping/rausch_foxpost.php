@@ -557,7 +557,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
 
                 $data = $data_temp;
 
-                $this->response->redirect($this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost/orders', 'user_token=' . $this->session->data['user_token'] . '&sync=' . $foxpost_data['foxpost_order_id'], true));
+                $this->response->redirect($this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&sync=' . $foxpost_data['foxpost_order_id'], true));
             }
 
             // $data['data'] = $resp;
@@ -569,8 +569,8 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         // LIST
         else {
 
-            $data['link_base'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost/orders', 'user_token=' . $this->session->data['user_token'], true);
-            $data['link_archive'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost/orders', 'user_token=' . $this->session->data['user_token'] . '&filter=archive', true);
+            $data['link_base'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'], true);
+            $data['link_archive'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&filter=archive', true);
 
             $orderby = isset($get['orderby']) ? $get['orderby'] : 'date_added';
             $orderbysub = isset($get['orderbysub']) ? $get['orderbysub'] : 'DESC';
@@ -588,9 +588,9 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $data['data'] = $query->rows;
 
             foreach ($data['data'] as &$item) {
-                $item['link_sync'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost/orders', 'user_token=' . $this->session->data['user_token'] . '&sync=' . $item['foxpost_order_id'], true);
-                $item['link_barcode'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost/orders', 'user_token=' . $this->session->data['user_token'] . '&barcode=' . $item['foxpost_order_id'], true);
-                $item['link_create'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost/orders', 'user_token=' . $this->session->data['user_token'] . '&create=' . $item['foxpost_order_id'], true);
+                $item['link_sync'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&sync=' . $item['foxpost_order_id'], true);
+                $item['link_barcode'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&barcode=' . $item['foxpost_order_id'], true);
+                $item['link_create'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&create=' . $item['foxpost_order_id'], true);
                 $item['link_order'] = $this->url->link('sale/order/info', 'user_token=' . $this->session->data['user_token'] . '&order_id=' . $item['order_id'], true);
 
                 list($temp, $foxpost_type) = explode(".", $item['foxpost_type']);
@@ -631,7 +631,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
 
             $data['breadcrumbs'][] = array(
                 'text' => $this->language->get('text_orders'),
-                'href' => $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost/orders', 'user_token=' . $this->session->data['user_token'], true)
+                'href' => $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'], true)
             );
 
             $data['header'] = $this->load->controller('common/header');
