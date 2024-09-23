@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>{{ title }}</title>
+</head>
+<body style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #000000;">
+<div style="width: 680px;"><a href="{{ store_url }}" title="{{ store_name }}"><img src="{{ logo }}" alt="{{ store_name }}" style="margin-bottom: 20px; border: none;" /></a>
+  <p style="margin-top: 0px; margin-bottom: 20px;">{{ mail_foxpost_greeting }}</p>
+  {% if customer_id %}
+  <p style="margin-top: 0px; margin-bottom: 20px;">{{ mail_foxpost_link }}</p>
+  <p style="margin-top: 0px; margin-bottom: 20px;"><a href="{{ link }}">{{ link }}</a></p>
+  {% endif %}
+  {% if download %}
+  <p style="margin-top: 0px; margin-bottom: 20px;">{{ mail_foxpost_download }}</p>
+  <p style="margin-top: 0px; margin-bottom: 20px;"><a href="{{ download }}">{{ download }}</a></p>
+  {% endif %}
+  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #DDDDDD; border-left: 1px solid #DDDDDD; margin-bottom: 20px;">
+    <thead>
+      <tr>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;" colspan="2">{{ mail_foxpost_order_detail }}</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;"><b>{{ mail_foxpost_order_id }}</b> {{ order_info['order_id'] }}<br/>
+          <b>{{ mail_foxpost_date_added }}</b> {{ order_info['date_added'] }}<br/>
+          <b>{{ mail_foxpost_payment_method }}</b> {{ order_info['payment_method'] }}<br/>
+          {% if order_info['shipping_method'] %} <b>{{ mail_foxpost_shipping_method }}</b> {{ order_info['shipping_method'] }}
+          {% endif %}</td>
+        <td style="vertical-align: top; font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;"><b>{{ mail_foxpost_email }}</b> {{ order_info['email'] }}<br/>
+          <b>{{ mail_foxpost_telephone }}</b> {{ order_info['telephone'] }}<br/>
+          <b>{{ mail_foxpost_order_status }}</b> {{ order_info['order_status'] }}<br/></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #DDDDDD; border-left: 1px solid #DDDDDD; margin-bottom: 20px;">
+    <thead>
+      <tr>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;">{{ mail_foxpost_instruction }}</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
+            {{ mail_foxpost_tracking_link }}<br>
+            <br>
+            <a href="https://foxpost.hu/csomagkovetes/?code={{ foxpost_data['foxpost_barcode'] }}">https://foxpost.hu/csomagkovetes/?code={{ foxpost_data['foxpost_barcode'] }}</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  {#
+  <table style="border-collapse: collapse; width: 100%; border-top: 1px solid #DDDDDD; border-left: 1px solid #DDDDDD; margin-bottom: 20px;">
+    <thead>
+      <tr>
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;">{{ mail_foxpost_payment_address }}</td>
+        {% if shipping_address %}
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;">{{ mail_foxpost_shipping_address }}</td>
+        {% endif %} </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">{{ payment_address }}</td>
+        {% if shipping_address %}
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">{{ shipping_address }}</td>
+        {% endif %} </tr>
+    </tbody>
+  </table>
+  #}
+
+  <p style="margin-top: 0px; margin-bottom: 20px;">{{ mail_foxpost_footer }}</p>
+</div>
+</body>
+</html>

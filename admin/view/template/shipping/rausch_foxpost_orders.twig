@@ -1,0 +1,334 @@
+{{ header }}{{ column_left }}
+
+<div id="content">
+
+	<div class="page-header">
+		<div class="container-fluid">
+			<div class="pull-right">
+
+				{% if not archive %}
+					<a href="#" class="btn btn-primary" id="foxpost-sync-selected" >
+						<i class="fa fa-fw fa-refresh"></i> {{ text_sync_selected }}
+					</a>
+
+					<div class="btn-group">
+						<a data-toggle="dropdown" class="btn btn-primary dropdown-toggle" >
+							<i class="fa fa-fw fa-barcode"></i>
+							{{ text_get_barcode }}
+							<i class="fa fa-fw fa-caret-down"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-right">
+							<li><a href="#" class="foxpost-barcode-selected" data-pagesize="A5">{{ text_page_size }}: A5</a></li>
+							<li><a href="#" class="foxpost-barcode-selected" data-pagesize="A6">{{ text_page_size }}: A6</a></li>
+							<li><a href="#" class="foxpost-barcode-selected" data-pagesize="A7">{{ text_page_size }}: A7</a></li>
+							<li><a href="#" class="foxpost-barcode-selected" data-pagesize="_85x85">{{ text_page_size }}: 85x85</a></li>
+						</ul>
+					</div>
+
+					<div class="btn-group">
+						<a data-toggle="dropdown" class="btn btn-primary dropdown-toggle" >
+							<i class="fa fa-fw fa-file-excel-o"></i>
+							{{ text_export_selected }}
+							<i class="fa fa-fw fa-caret-down"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-right">
+							<li><a href="#" data-size="xs" class="foxpost-export-selected">{{ text_package_size_for_create }}: XS</a></li>
+							<li><a href="#" data-size="s" class="foxpost-export-selected">{{ text_package_size_for_create }}: S</a></li>
+							<li><a href="#" data-size="m" class="foxpost-export-selected">{{ text_package_size_for_create }}: M</a></li>
+							<li><a href="#" data-size="l" class="foxpost-export-selected">{{ text_package_size_for_create }}: L</a></li>
+							<li><a href="#" data-size="xl" class="foxpost-export-selected">{{ text_package_size_for_create }}: XL</a></li>
+						</ul>
+					</div>
+
+					<a href="{{ link_archive }}" class="btn btn-default">
+						<i class="fa fa-fw fa-history"></i>
+						{{ text_go_to_archives }}
+					</a>
+				{% else %}
+					<div class="btn-group">
+						<a data-toggle="dropdown" class="btn btn-primary dropdown-toggle" >
+							<i class="fa fa-fw fa-file-excel-o"></i>
+							{{ text_export_selected }}
+							<i class="fa fa-fw fa-caret-down"></i>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-right">
+							<li><a href="#" data-size="xs" class="foxpost-export-selected">{{ text_package_size_for_create }}: XS</a></li>
+							<li><a href="#" data-size="s" class="foxpost-export-selected">{{ text_package_size_for_create }}: S</a></li>
+							<li><a href="#" data-size="m" class="foxpost-export-selected">{{ text_package_size_for_create }}: M</a></li>
+							<li><a href="#" data-size="l" class="foxpost-export-selected">{{ text_package_size_for_create }}: L</a></li>
+							<li><a href="#" data-size="xl" class="foxpost-export-selected">{{ text_package_size_for_create }}: XL</a></li>
+						</ul>
+					</div>
+
+					<a href="{{ link_base }}" class="btn btn-default">
+						<i class="fa fa-fw fa-truck"></i>
+						{{ text_go_to_pendings }}
+					</a>
+				{% endif %}
+
+			</div>
+			<h1>{{ heading_title }}</h1>
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+				<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+
+
+      {% if not api_status %}
+        <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i>
+			{{ text_api_status }}:
+			<b>{{ text_error }}</b>
+
+          	<button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+      {% endif %}
+
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					{% if not archive %}
+						<i class="fa fa-truck"></i>
+						{{ text_pending_items }}
+					{% else %}
+						<i class="fa fa-history"></i>
+						{{ text_archived_items }}
+					{% endif %}
+					</h3>
+			</div>
+
+			<div class="panel-body">
+
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th width="1%">
+									<input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);">
+								</th>
+								<th width="1%" style="white-space: nowrap;">
+									<a href="{{ link_base|replace({'&amp;': '&'}) }}&orderby=foxpost_order_id&orderbysub={{ (orderbysub=='DESC')?'ASC':'DESC' }}">
+										{{ column_order_id }}
+									</a>
+								</th>
+								<th class="text-center">
+									<a href="{{ link_base|replace({'&amp;': '&'}) }}&orderby=foxpost_barcode&orderbysub={{ (orderbysub=='DESC')?'ASC':'DESC' }}">
+										{{ column_barcode }}
+									</a>
+								</th>
+								<th class="text-center">
+									<a href="{{ link_base|replace({'&amp;': '&'}) }}&orderby=foxpost_shortname&orderbysub={{ (orderbysub=='DESC')?'ASC':'DESC' }}">
+										{{ column_foxpost_status }}
+									</a>
+								</th>
+								<th class="text-center">
+									<a href="{{ link_base|replace({'&amp;': '&'}) }}&orderby=foxpost_size&orderbysub={{ (orderbysub=='DESC')?'ASC':'DESC' }}">
+										{{ column_foxpost_size }}
+									</a>
+								</th>
+								<th class="text-center">
+									<a href="{{ link_base|replace({'&amp;': '&'}) }}&orderby=foxpost_type&orderbysub={{ (orderbysub=='DESC')?'ASC':'DESC' }}">
+										{{ column_shipping_method }}
+									</a>
+								</th>
+								<th class="text-center">
+									{{ column_cod }}
+								</th>
+								<th class="text-center">
+									<a href="{{ link_base|replace({'&amp;': '&'}) }}&orderby=date_added&orderbysub={{ (orderbysub=='DESC')?'ASC':'DESC' }}">
+										{{ column_order_create_at }}
+									</a>
+								</th>
+								<th class="text-center">
+									<a href="{{ link_base|replace({'&amp;': '&'}) }}&orderby=date_modified&orderbysub={{ (orderbysub=='DESC')?'ASC':'DESC' }}">
+										{{ column_last_sync }}
+									</a>
+								</th>
+								{% if not archive %}
+									<th width="1%"></th>
+								{% endif %}
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in data %}
+								<tr>
+									<td>
+										<input type="checkbox" class="foxpost-selected" name="selected[]" value="{{ item['foxpost_order_id'] }}">
+									</td>
+									<td class="text-center"><a href="{{ item['link_order'] }}">{{ item['order_id'] }}</a></td>
+									<td class="text-center">
+										<b><a href="https://foxpost.hu/csomagkovetes/?code={{ item['foxpost_barcode'] }}" target="_blank">{{ item['foxpost_barcode'] }}</a></b>
+									</td>
+									<td class="text-center">
+										{{  item['foxpost_shortname'] }}
+										{# { _context['text_foxpost_status_' ~ item['foxpost_status']]|default } #}
+									</td>
+									<td class="text-center">
+										<b>{{ item['foxpost_size'] }}</b>
+									</td>
+
+									<td>
+										{% if item['foxpost_type'] == 'transfer' %}
+											<b>{{ text_delivery }}</b>
+										{% else %}
+											<b>{{ text_apm }}:</b>
+											<i>{{ apms[item['foxpost_type']] }}</i>
+										{% endif %}
+									</td>
+									<td class="text-center">
+										{% if item['foxpost_cod'] %}
+											<i class="fa fa-check-square-o" aria-hidden="true"></i>
+										{% else %}
+											<i class="fa fa-square-o" aria-hidden="true"></i>
+										{% endif %}
+									</td>
+									<td class="text-center">{{ item['date_added'] }}</td>
+									<td class="text-center">{{ item['date_modified'] }}</td>
+									{% if not archive %}
+										<td class="text-right" style="white-space: nowrap;">
+
+											{% if not item['foxpost_barcode'] %}
+												
+												<div class="btn-group">
+													<a data-toggle="dropdown" class="btn btn-sm btn-primary dropdown-toggle">
+														<i class="fa fa-fw fa-upload"></i>
+														{{ text_create }}
+														 <i class="fa fa-fw fa-caret-down"></i>
+													</a>
+													<ul class="dropdown-menu dropdown-menu-right">
+														<li><a href="#" data-link="{{ item['link_create'] }}&size=xs">{{ text_package_size }}: XS</a></li>
+														<li><a href="#" data-link="{{ item['link_create'] }}&size=s">{{ text_package_size }}: S</a></li>
+														<li><a href="#" data-link="{{ item['link_create'] }}&size=m">{{ text_package_size }}: M</a></li>
+														<li><a href="#" data-link="{{ item['link_create'] }}&size=l">{{ text_package_size }}: L</a></li>
+														<li><a href="#" data-link="{{ item['link_create'] }}&size=xl">{{ text_package_size }}: XL</a></li>
+													</ul>
+												</div>
+
+											{% else %}
+
+												<div class="btn-group">
+													<a data-toggle="dropdown" class="btn btn-sm btn-primary dropdown-toggle">
+														<i class="fa fa-fw fa-barcode"></i>
+														{{ text_barcode }}
+														 <i class="fa fa-fw fa-caret-down"></i>
+													</a>
+													<ul class="dropdown-menu dropdown-menu-right">
+														<li><a target="_blank" href="{{ item['link_barcode'] }}&pagesize=A5">{{ text_page_size }}: A5</a></li>
+														<li><a target="_blank" href="{{ item['link_barcode'] }}&pagesize=A6">{{ text_page_size }}: A6</a></li>
+														<li><a target="_blank" href="{{ item['link_barcode'] }}&pagesize=A7">{{ text_page_size }}: A7</a></li>
+														<li><a target="_blank" href="{{ item['link_barcode'] }}&pagesize=_85x85">{{ text_page_size }}: 85x85</a></li>
+													</ul>
+												</div>
+
+												<a data-link="{{ item['link_sync'] }}" class="btn btn-sm btn-primary"><i class="fa fa-fw fa-refresh"></i> {{ text_sync }}</a>
+
+											{% endif %}
+										</td>
+									{% endif %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+</div>
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+
+		// Row actions
+
+		$('a[data-link]').on('click', function() {
+			$.ajax({
+				url: $(this).data('link')
+			})
+			.done(function( data ) {
+				location.reload();
+			})
+			.fail(function( data ) {
+				alert( data.responseJSON.message );
+				location.reload();
+			})
+
+			return false;
+		})
+
+		// Barcode
+
+		$('.foxpost-barcode-selected').on('click', function() {
+			let ids = [];
+
+			$('input.foxpost-selected:checked').each(function() {
+				ids.push(this.value);
+			});
+
+			if (ids.length) {
+				let url = "{{ link_base|replace({'&amp;': '&'}) }}&pagesize=" + $(this).data('pagesize') + "&barcode=" + ids.join(',');
+				window.open(url, '_blank');
+			}
+
+			location.reload();
+
+			return false;
+		})
+
+		// Export
+
+		$('.foxpost-export-selected').on('click', function() {
+			let ids = [];
+			let size = $(this).data('size');
+
+			$('input.foxpost-selected:checked').each(function() {
+				ids.push(this.value);
+			});
+
+			if (ids.length) {
+				let url = "{{ link_base|replace({'&amp;': '&'}) }}&size=" + size + "&export=" + ids.join(',');
+				window.open(url, '_blank');
+			}
+
+			location.reload();
+
+			return false;
+		})
+
+		// Sync
+
+		$('#foxpost-sync-selected').on('click', function() {
+			let ids = [];
+
+			$('input.foxpost-selected:checked').each(function() {
+				ids.push(this.value);
+			});
+
+			if (ids.length) {
+				$.ajax({
+					url: "{{ link_base|replace({'&amp;': '&'}) }}&sync=" + ids.join(',')
+				})
+				.done(function( data ) {
+					location.reload();
+				})
+				.fail(function( data ) {
+					alert( data.responseJSON.message );
+				})
+			}
+
+			return false;
+		})
+
+	</script>
+
+{% endblock %}
+
+{{ footer }}

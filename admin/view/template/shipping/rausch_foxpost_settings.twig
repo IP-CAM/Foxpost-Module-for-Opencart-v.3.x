@@ -1,0 +1,302 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="float-end">
+                <button type="submit" form="form-shipping" data-bs-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa-solid fa-save"></i></button>
+                <a href="{{ back }}" data-bs-toggle="tooltip" title="{{ button_back }}" class="btn btn-light"><i class="fa-solid fa-reply"></i></a></div>
+            <h1>{{ heading_title }}</h1>
+            <ol class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                    {% endfor %}
+            </ol>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <form id="form-shipping" action="{{ save }}" method="post" data-oc-toggle="ajax">
+            <div class="card">
+                <div class="card-header"><i class="fa-solid fa-pencil"></i> {{ heading_title }}</div>
+
+                <div class="card-header">
+                    <h3 class="panel-title"><i class="fa fa-truck"></i> {{ text_shipping_settings }}</h3>
+                </div>
+
+                <div class="card-body">
+                    
+                    <div class="row mb-3">
+                        <label for="input-status" class="col-sm-2 col-form-label">
+                            {{ text_status }}
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="shipping_rausch_foxpost_status" value="0"/>
+                                <input type="checkbox" name="shipping_rausch_foxpost_status" value="1" id="input-status" class="form-check-input"{% if shipping_rausch_foxpost_status %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-shipping_apm_cost">{{ text_shipping_apm_cost }}</label>
+                        <div class="col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <input type="text" name="shipping_rausch_foxpost_apm_cost" value="{{ shipping_rausch_foxpost_apm_cost }}" placeholder="" id="input-shipping_apm_cost" class="form-control" />
+                                </div>
+                            </div>
+                            <div id="error-apm-cost" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-shipping_apmcod_cost">{{ text_shipping_apmcod_cost }}</label>
+                        <div class="col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <input type="text" name="shipping_rausch_foxpost_apmcod_cost" value="{{ shipping_rausch_foxpost_apmcod_cost }}" placeholder="" id="input-shipping_apmcod_cost" class="form-control" />
+                                </div>
+                            </div>
+                            <div id="error-apmcod-cost" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-shipping_transfer_cost">{{ text_shipping_transfer_cost }}</label>
+                        <div class="col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <input type="text" name="shipping_rausch_foxpost_transfer_cost" value="{{ shipping_rausch_foxpost_transfer_cost }}" placeholder="" id="input-shipping_transfer_cost" class="form-control" />
+                                </div>
+                            </div>
+                            <div id="error-transfer-cost" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-shipping_transfercod_cost">{{ text_shipping_transfercod_cost }}</label>
+                        <div class="col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <input type="text" name="shipping_rausch_foxpost_transfercod_cost" value="{{ shipping_rausch_foxpost_transfercod_cost }}" placeholder="" id="input-shipping_transfercod_cost" class="form-control" />
+                                </div>
+                            </div>
+                            <div id="error-transfercod-cost" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-shipping_freelimit">{{ text_shipping_freelimit }}</label>
+                        <div class="col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <input type="text" name="shipping_rausch_foxpost_freelimit" value="{{ shipping_rausch_foxpost_freelimit }}" placeholder="" id="input-shipping_freelimit" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">{{ text_shipping_services }}</label>
+                        <div class="col-sm-10">
+                            <div class="well well-sm">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="shipping_rausch_foxpost_service[]" value="apm" {% if 'apm' in shipping_rausch_foxpost_service %}checked="checked"{% endif %}/>
+                                        {{ text_shipping_apm }}
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="shipping_rausch_foxpost_service[]" value="apmcod" {% if 'apmcod' in shipping_rausch_foxpost_service %}checked="checked"{% endif %}/>
+                                        {{ text_shipping_apmcod }}
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>                  
+                                        <input type="checkbox" name="shipping_rausch_foxpost_service[]" value="transfer" {% if 'transfer' in shipping_rausch_foxpost_service %}checked="checked"{% endif %} />
+                                        {{ text_shipping_transfer }}
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>                  
+                                        <input type="checkbox" name="shipping_rausch_foxpost_service[]" value="transfercod" {% if 'transfercod' in shipping_rausch_foxpost_service %}checked="checked"{% endif %} />
+                                        {{ text_shipping_transfercod }}
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="error-service" class="invalid-feedback"></div>
+                            <button type="button" onclick="$(this).parent().find(':checkbox').prop('checked', true);" class="btn btn-link">{{ text_select_all }}</button> / <button type="button" onclick="$(this).parent().find(':checkbox').prop('checked', false);" class="btn btn-link">{{ text_unselect_all }}</button></div>
+                    </div>
+
+                    {% set shipping_rausch_foxpost_order_status_id = shipping_rausch_foxpost_order_status_id?shipping_rausch_foxpost_order_status_id:2 %}
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-order-status">{{ text_order_status }}</label>
+                        <div class="col-sm-10">
+                            <select name="shipping_rausch_foxpost_order_status_id" id="input-order-status" class="form-control">
+                                {% for order_status in order_statuses %}
+                                    {% if order_status.order_status_id == shipping_rausch_foxpost_order_status_id %}
+                                        <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                    {% else %}
+                                        <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-order-foxpost-status">{{ text_order_status_foxpost_sync }}</label>
+                        <div class="col-sm-10">
+
+                            <table class="table"><thead>
+                                    <tr>
+                                        <td class="text-nowrap">
+                                            {{ text_foxpost_status }}
+                                        </td>
+                                        <td class="text-nowrap">
+                                            {{ text_opencart_status }}
+                                        </td>
+                                    </tr>
+                                </thead><tbody>
+                                    {% for i in ['CREATE', 'OPEROUT', 'OPERIN', 'C2CIN', 'C2OUT', 'SORTIN'] %}
+                                        <tr>
+                                            <td width="1%">
+                                                {{ i }}
+                                            </td>
+                                            <td>
+
+                                                <select name="shipping_rausch_foxpost_order_foxpost_{{ i }}_status_id" id="input-order-foxpost-status" class="form-control">
+                                                    <option value="">({{ text_order_status_nochange }})</option>
+                                                    {% for order_status in order_statuses %}
+                                                        {% if order_status.order_status_id == _context['shipping_rausch_foxpost_order_foxpost_' ~ i ~ '_status_id'] %}
+                                                            <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                                        {% else %}
+                                                            <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </body></table>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-sort-order">{{ text_sort_order }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="shipping_rausch_foxpost_sort_order" value="{{ shipping_rausch_foxpost_sort_order }}" placeholder="{{ text_sort_order }}" id="input-sort-order" class="form-control" />
+                        </div>
+                    </div>
+
+                    
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="panel-title"><i class="fa fa-code"></i> {{ text_api_settings }}</h3>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label">{{ text_link_info }}</label>
+                        <div class="col-sm-10 control-label" style="text-align: left;">
+                            <a href="https://foxpost.hu/beallitasok" target="_blank">https://foxpost.hu/beallitasok</a>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <label for="input-status" class="col-sm-2 col-form-label">
+                            {{ text_test }}
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="form-check form-switch form-switch-lg">
+                                <input type="hidden" name="shipping_rausch_foxpost_test" value="0"/>
+                                <input type="checkbox" name="shipping_rausch_foxpost_test" value="1" id="input-test" class="form-check-input"{% if shipping_rausch_foxpost_test %} checked{% endif %}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3 required">
+                        <label class="col-sm-2 col-form-label" for="input-api_username">{{ text_api_username }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="shipping_rausch_foxpost_username" value="{{ shipping_rausch_foxpost_username }}" placeholder="{{ text_api_username }}" id="input-api_username" class="form-control" />
+                            <div id="error-username" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 required">
+                        <label class="col-sm-2 col-form-label" for="input-api_password">{{ text_api_password }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="shipping_rausch_foxpost_password" value="{{ shipping_rausch_foxpost_password }}" placeholder="{{ text_api_password }}" id="input-api_password" class="form-control" />
+                            <div id="error-password" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 required">
+                        <label class="col-sm-2 col-form-label" for="input-api_key">{{ text_api_key }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="shipping_rausch_foxpost_key" value="{{ shipping_rausch_foxpost_key }}" placeholder="{{ text_api_key }}" id="input-api_key" class="form-control" />
+                            <div id="error-key" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="input-api_key">{{ text_api_status }}</label>
+                        <div class="col-sm-10">
+                            <div class="control-label pull-left">
+                                {% if api_status %}
+                                    <b class="text-success">{{ text_ok }}</b>
+                                {% else %}
+                                    <b class="text-danger">{{ text_error }} ({{ api_error }})</b> 
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="panel-title"><i class="fa fa-archive"></i> {{ text_apm_list }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="max-height: 260px; overflow: hidden; overflow-y: scroll;">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{ text_apm_list_id }}</th>
+                                <th>{{ text_apm_list_name }}</th>
+                                <th>{{ text_apm_list_group }}</th>
+                                <th>{{ text_apm_list_address }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in apms %}
+                                <tr>
+                                    <td>{{ item.operator_id }}</td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.group }}</td>
+                                    <td>{{ item.address }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% block javascripts %}
+
+    <script type="text/javascript">
+
+    </script>
+
+{% endblock %}
+
+{{ footer }}
