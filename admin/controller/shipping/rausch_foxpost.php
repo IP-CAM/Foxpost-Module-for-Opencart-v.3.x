@@ -781,6 +781,11 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                     'href'      => $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost', 'user_token=' . $this->session->data['user_token'], true),
                     'children'  => []
             ];
+            $link[] = [
+                    'name'      => $this->language->get('text_orderlist'),
+                    'href'      => $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'], true),
+                    'children'  => []
+            ];
 
             foreach ($data['menus'] as $key => $menu) {             
                 $uj_menu[] = $menu;
