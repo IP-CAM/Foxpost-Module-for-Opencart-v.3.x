@@ -716,6 +716,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         
         // Remove Event
         $this->model_setting_event->deleteEventByCode('rausch_foxpost_adminmenu');
+        $this->model_setting_event->deleteEventByCode('rausch_shipping_foxpost');
         
         // Add Event
         if (VERSION >= '4.0.2.0') {
@@ -724,6 +725,14 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 'description' => 'Admin Menu',
                 'trigger' => 'admin/view/common/column_left/before',
                 'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost.AddtoAdminMenu',
+                'status' => 1,
+                'sort_order' => 0
+            ]);
+            $this->model_setting_event->addEvent([
+                'code' => 'rausch_shipping_foxpost',
+                'description' => 'Admin Menu',
+                'trigger' => 'catalog/model/checkout/order/addHistory/after',
+                'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost.addOrder',
                 'status' => 1,
                 'sort_order' => 0
             ]);
@@ -736,8 +745,17 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 'status' => 1,
                 'sort_order' => 0
             ]);
+            $this->model_setting_event->addEvent([
+                'code' => 'rausch_shipping_foxpost',
+                'description' => 'Admin Menu',
+                'trigger' => 'catalog/model/checkout/order/addHistory/after',
+                'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost|addOrder',
+                'status' => 1,
+                'sort_order' => 0
+            ]);
         } else {
             $this->model_setting_event->addEvent('rausch_foxpost_adminmenu', 'Admin Menu', 'admin/view/common/column_left/before', 'extension/rausch_foxpost/shipping/rausch_foxpost|AddtoAdminMenu', 1, 0);
+            $this->model_setting_event->addEvent('rausch_shipping_foxpost', 'catalog/model/checkout/order/addHistory/after', 'extension/rausch_foxpost/shipping/rausch_foxpost|addOrder');
         }
         
         // Permission
@@ -762,6 +780,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $this->load->model('setting/event');
             // Remove Event
             $this->model_setting_event->deleteEventByCode('rausch_foxpost_adminmenu');
+            $this->model_setting_event->deleteEventByCode('rausch_shipping_foxpost');
         }
     }
     
