@@ -1,12 +1,15 @@
 </label>
-
+<div style="clear: both;"></div>
+<div style="display: block; width: 100%;">
 <div id="foxpostmap" style="display: none; padding-top: 10px;">
     <div class="panel panel-default">
         <div class="panel-body" style="padding: 0;">
-            <iframe  frameborder="0" loading="lazy" src="https://cdn.foxpost.hu/apt-finder/v1/app/?lang={{ lang=='hu-hu'?'hu':'en' }}" width="100%" height="600px"></iframe>
+            <iframe  frameborder="0" loading="lazy" src="https://cdn.foxpost.hu/apt-finder/v1/app/?lang={{ lang }}" width="100%" height="800px"></iframe>
         </div>
     </div>
 </div>
+</div>
+
 
 <script>
 
@@ -16,27 +19,27 @@
 
     function foxpost_preinit() {
 
-        if (!($('input[value="foxpost.apm"]').length == 0 && $('input[value="foxpost.apmcod"]').length == 0)) {
+        if (!($('input[value="rausch_foxpost.apm"]').length == 0 && $('input[value="rausch_foxpost.apmcod"]').length == 0)) {
 
-            apmradio    = $('input[value="foxpost.apm"]');
-            apmcodradio = $('input[value="foxpost.apmcod"]');
+            apmradio    = $('input[value="rausch_foxpost.apm"]');
+            apmcodradio = $('input[value="rausch_foxpost.apmcod"]');
 
             $('.modal-dialog').css('width', '100%');
             $('.modal-dialog').css('max-width', '1000px');
 
-            $('input[value="foxpost.transfer"]').on('click', function() {
+            $('input[value="rausch_foxpost.transfer"]').on('click', function() {
                 foxpost_init('transfer');
             })
 
-            $('input[value="foxpost.transfercod"]').on('click', function() {
+            $('input[value="rausch_foxpost.transfercod"]').on('click', function() {
                 foxpost_init('transfercod');
             })
 
-            $('input[value="foxpost.apm"]').on('click', function() {
+            $('input[value="rausch_foxpost.apm"]').on('click', function() {
                 foxpost_init('apm');
             })
 
-            $('input[value="foxpost.apmcod"]').on('click', function() {
+            $('input[value="rausch_foxpost.apmcod"]').on('click', function() {
                 foxpost_init('apmcod');
             })
 
@@ -46,11 +49,11 @@
             setTimeout( function() {
                 $('#removethislabel').remove();
 
-                $('[value^="foxpost.hu"]').each( function(index, item) {
-                    $(item).closest('div.radio').remove();
+                $('[value^="rausch_foxpost.hu"]').each( function(index, item) {
+                    $(item).closest('div.form-check').remove();
                 })
 
-                if ('{{ shipping_method_code|split('.')[0] }}' == 'foxpost') {
+                if ('{{ shipping_method_code|split('.')[0] }}' == 'rausch_foxpost') {
 
                     $(apmradio).prop(   'value', "{{ shipping_method_code_apm }}");
                     $(apmradio).closest('label').find('input').get(0).nextSibling.remove();
@@ -97,18 +100,18 @@
         if (typeof $(apmcodradio).closest('label').find('input').get(0) != 'undefined') {
             $(apmcodradio).closest('label').find('input').get(0).nextSibling.remove();
         }
-        $(apmcodradio).prop('value', "foxpost." + apt.operator_id + '_cod');
+        $(apmcodradio).prop('value', "rausch_foxpost." + apt.operator_id + '_cod');
 
         $(apmradio).closest('label').append("{{ text_foxpost_apm }}" + " (" + apt.name + ") - " + "{{ _apm_cost }}");
         if (typeof $(apmradio).closest('label').find('input').get(0) != 'undefined') {
             $(apmradio).closest('label').find('input').get(0).nextSibling.remove();
         }
-        $(apmradio).prop('value', "foxpost."+apt.operator_id);
+        $(apmradio).prop('value', "rausch_foxpost."+apt.operator_id);
     }
 
     var foxpostwatchdog = setInterval( function() {
 
-        if ($('[value^="foxpost."]').length > 10) {
+        if ($('[value^="rausch_foxpost."]').length > 10) {
             foxpost_preinit();
         }
     }, 100);
