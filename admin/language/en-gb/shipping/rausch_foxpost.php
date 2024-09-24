@@ -19,6 +19,8 @@ $_['text_list']                                = 'Foxpost Configurations';
 $_['text_admin_menu']                          = 'Foxpost';
 $_['text_orderlist']                           = 'Foxpost Orders';
 
+$_['entry_tax_class']                          = 'Tax';    
+
 $_['text_shipping_settings']                   = 'Shipping settings';
 $_['text_shipping_surcharge']                  = 'Surcharge';
 $_['text_shipping_freelimit']                  = 'Free limit';

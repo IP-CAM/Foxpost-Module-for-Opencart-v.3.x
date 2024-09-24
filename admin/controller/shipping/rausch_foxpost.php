@@ -45,6 +45,10 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         $data['shipping_rausch_foxpost_username'] = $this->config->get('shipping_rausch_foxpost_username');
         $data['shipping_rausch_foxpost_password'] = $this->config->get('shipping_rausch_foxpost_password');
         $data['shipping_rausch_foxpost_key'] = $this->config->get('shipping_rausch_foxpost_key');
+        
+        $this->load->model('localisation/tax_class');
+        $data['tax_classes'] = $this->model_localisation_tax_class->getTaxClasses();
+        $data['shipping_rausch_foxpost_tax_class_id'] = $this->config->get('shipping_rausch_foxpost_tax_class_id');        
 
         foreach (['CREATE', 'OPEROUT', 'OPERIN', 'C2CIN', 'C2OUT', 'SORTIN'] as $item) {
             $data['shipping_rausch_foxpost_order_foxpost_' . $item . '_status_id'] = $this->config->get('shipping_rausch_foxpost_order_foxpost_' . $item . '_status_id');

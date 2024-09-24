@@ -61,6 +61,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Model
 
 		$quote_data = array();
 
+                
 		$apm_cost         = $this->config->get('shipping_rausch_foxpost_apm_cost');
 		$apmcod_cost      = $this->config->get('shipping_rausch_foxpost_apmcod_cost');
 		$transfer_cost    = $this->config->get('shipping_rausch_foxpost_transfer_cost');
@@ -69,12 +70,12 @@ class RauschFoxpost extends \Opencart\System\Engine\Model
 		$freelimit        = $this->config->get('shipping_rausch_foxpost_freelimit');
 		$total            = round($this->cart->getTotal());
                 
-		$_apm_cost         = $this->currency->format(floatval($apm_cost), strtoupper($this->session->data['currency']));
-		$_apmcod_cost      = $this->currency->format(floatval($apmcod_cost), strtoupper($this->session->data['currency']));
-		$_transfer_cost    = $this->currency->format(floatval($transfer_cost), strtoupper($this->session->data['currency']));
-		$_transfercod_cost = $this->currency->format(floatval($transfercod_cost), strtoupper($this->session->data['currency']));
-//                file_put_contents('session.txt', var_export($freelimit, true) . PHP_EOL , FILE_APPEND);
-		if ($freelimit && $freelimit <= $total) {
+		$_apm_cost         = $this->currency->format(floatval($this->tax->calculate($apm_cost, $this->config->get('shipping_rausch_foxpost_tax_class_id'), $this->config->get('config_tax') )), strtoupper($this->session->data['currency']));
+		$_apmcod_cost      = $this->currency->format(floatval($this->tax->calculate($apmcod_cost, $this->config->get('shipping_rausch_foxpost_tax_class_id'), $this->config->get('config_tax'))), strtoupper($this->session->data['currency']));
+		$_transfer_cost    = $this->currency->format(floatval($this->tax->calculate($transfer_cost, $this->config->get('shipping_rausch_foxpost_tax_class_id'), $this->config->get('config_tax'))), strtoupper($this->session->data['currency']));
+		$_transfercod_cost = $this->currency->format(floatval($this->tax->calculate($transfercod_cost, $this->config->get('shipping_rausch_foxpost_tax_class_id'), $this->config->get('config_tax'))), strtoupper($this->session->data['currency']));
+		
+                if ($freelimit && $freelimit <= $total) {
 			$apm_cost          = 0;
 			$apmcod_cost       = 0;
 			$transfer_cost     = 0;
@@ -99,7 +100,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Model
 					'code'         => "foxpost.transfer",
 					'title'        => $text_foxpost_transfer,
 					'cost'         => $transfer_cost,
-					'tax_class_id' => "0",
+					'tax_class_id' => $this->config->get('shipping_rausch_foxpost_tax_class_id'),
 					'text'         => $_transfer_cost
 				);
 			}
@@ -109,7 +110,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Model
 					'code'         => "foxpost.transfercod",
 					'title'        => $text_foxpost_transfercod,
 					'cost'         => $transfercod_cost,
-					'tax_class_id' => "0",
+					'tax_class_id' => $this->config->get('shipping_rausch_foxpost_tax_class_id'),
 					'text'         => $_transfercod_cost
 				);
 			}
@@ -135,8 +136,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Model
 						'code'         => "rausch_foxpost.apm",
 						'name'        => $text_foxpost_apm,
 						'cost'         => $apm_cost,
-						'tax_class_id' => "0",
-//						'text'         => $_apm_cost
+						'tax_class_id' => $this->config->get('shipping_rausch_foxpost_tax_class_id'),
 						'text'         => $_apm_cost . (!in_array('apmcod', $this->config->get('shipping_rausch_foxpost_service')) ? $foxpost_widget : '')
 					);
 
@@ -145,7 +145,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Model
 							'code'         => 'rausch_foxpost.' . $item['operator_id'],
 							'name'        => $text_foxpost_apm . " (" . $item['name'] . ")",
 							'cost'         => $apm_cost,
-							'tax_class_id' => "0",
+							'tax_class_id' => $this->config->get('shipping_rausch_foxpost_tax_class_id'),
 							'text'         => $_apm_cost
 						);
 					}
@@ -156,7 +156,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Model
 						'code'         => "rausch_foxpost.apmcod",
 						'name'        => $text_foxpost_apmcod,
 						'cost'         => $apmcod_cost,
-						'tax_class_id' => "0",
+						'tax_class_id' => $this->config->get('shipping_rausch_foxpost_tax_class_id'),
 						'text'         => $_apmcod_cost . $foxpost_widget
 					);
 
@@ -165,7 +165,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Model
 							'code'         => 'rausch_foxpost.' . $item['operator_id'] . '_cod',
 							'name'        => $text_foxpost_apmcod . " (" . $item['name'] . ")",
 							'cost'         => $apmcod_cost,
-							'tax_class_id' => "0",
+							'tax_class_id' => $this->config->get('shipping_rausch_foxpost_tax_class_id'),
 							'text'         => $_apmcod_cost
 						);
 					}

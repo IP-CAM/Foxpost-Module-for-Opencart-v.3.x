@@ -17,6 +17,8 @@ $_['text_list']                                = 'Foxpost beállítások';
 $_['text_admin_menu']                          = 'Foxpost';
 $_['text_orderlist']                           = 'Foxpost rendelések';
 
+$_['entry_tax_class']                          = 'Adónem';    
+
 $_['text_shipping_settings']                   = 'Szállítási beállítások';
 $_['text_shipping_surcharge']                  = 'Surcharge';
 $_['text_shipping_freelimit']                  = 'Ingyenes limit';
