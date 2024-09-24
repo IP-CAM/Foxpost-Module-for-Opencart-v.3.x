@@ -595,7 +595,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 $item['link_sync'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&sync=' . $item['rausch_foxpost_order_id'], true);
                 $item['link_barcode'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&barcode=' . $item['rausch_foxpost_order_id'], true);
                 $item['link_create'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&create=' . $item['rausch_foxpost_order_id'], true);
-                $item['link_order'] = $this->url->link('sale/order/info', 'user_token=' . $this->session->data['user_token'] . '&order_id=' . $item['order_id'], true);
+                $item['link_order'] = $this->url->link('sale/order.info', 'user_token=' . $this->session->data['user_token'] . '&order_id=' . $item['order_id'], true);
 
                 list($temp, $foxpost_type) = explode(".", $item['foxpost_type']);
 
