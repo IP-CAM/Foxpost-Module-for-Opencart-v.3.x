@@ -2,9 +2,12 @@
 
 namespace Opencart\Admin\Controller\Extension\RauschFoxpost\Shipping;
 
-class RauschFoxpost extends \Opencart\System\Engine\Controller {
 
-    private $error = array();
+
+class RauschFoxpost extends \Opencart\System\Engine\Controller {
+    
+    private $error   = array();
+
     private $version = "1.0.21";
 
     public function index(): void {
@@ -48,10 +51,10 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         $data['shipping_rausch_foxpost_username'] = $this->config->get('shipping_rausch_foxpost_username');
         $data['shipping_rausch_foxpost_password'] = $this->config->get('shipping_rausch_foxpost_password');
         $data['shipping_rausch_foxpost_key'] = $this->config->get('shipping_rausch_foxpost_key');
-
+        
         $this->load->model('localisation/tax_class');
         $data['tax_classes'] = $this->model_localisation_tax_class->getTaxClasses();
-        $data['shipping_rausch_foxpost_tax_class_id'] = $this->config->get('shipping_rausch_foxpost_tax_class_id');
+        $data['shipping_rausch_foxpost_tax_class_id'] = $this->config->get('shipping_rausch_foxpost_tax_class_id');        
 
         foreach (['CREATE', 'OPEROUT', 'OPERIN', 'C2CIN', 'C2OUT', 'SORTIN'] as $item) {
             $data['shipping_rausch_foxpost_order_foxpost_' . $item . '_status_id'] = $this->config->get('shipping_rausch_foxpost_order_foxpost_' . $item . '_status_id');
@@ -150,59 +153,46 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
 
     // ORDERS
 
-    public function test() {
-        $json = [];
+    public function orders() {
         if (!$this->user->hasPermission('access', 'sale/order')) {
             $this->load->language('error/permission');
-            $json['error']['permission'] = $this->language->get('heading_title');
+            $this->document->setTitle($this->language->get('heading_title'));
+
+            $data['header'] = $this->load->controller('common/header');
+            $data['column_left'] = $this->load->controller('common/column_left');
+            $data['footer'] = $this->load->controller('common/footer');
+
+            $this->response->setOutput($this->load->view('error/permission', $data));
+
+            return;
         }
+
         $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
-        if (isset($json['error']) && !isset($json['error']['warning'])) {
-            $json['error']['warning'] = $this->language->get('error_warning');
+        $this->document->setTitle($this->language->get('heading_title'));
+
+        $get = $this->request->get;
+
+        // TEST
+
+        if (isset($get['test'])) {
+
+            exit;
         }
 
-        if (!$json) {
-            $json['success'] = $this->language->get('text_success');
-        }
+        // MIGRATE
 
-        $this->response->addHeader('Content-Type: application/json');
-        $this->response->setOutput(json_encode($json));
-    }
-
-    public function migrate() {
-        $json = [];
-        if (!$this->user->hasPermission('access', 'sale/order')) {
-            $this->load->language('error/permission');
-            $json['error']['permission'] = $this->language->get('heading_title');
-        }
-        $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
-        if (!$json) {
+        if (isset($get['migrate'])) {
             $query = $this->db->query("INSERT INTO " . DB_PREFIX . "rausch_foxpost_order (order_id, foxpost_type, foxpost_barcode, date_added) SELECT order_id, shipping_code, tracking, date_added FROM " . DB_PREFIX . "order WHERE order_id NOT IN ( SELECT order_id FROM " . DB_PREFIX . "rausch_foxpost_order )");
-            if ($query->num_rows) {
-                $json['adat'] = $foxpost_datas = $query->rows;
-                $json['success'] = $this->language->get('text_success');
-            } else {
-                $json['error']['migrate'] = $this->language->get('error_migrate');
-            }
-        }
-        if (isset($json['error']) && !isset($json['error']['warning'])) {
-            $json['error']['warning'] = $this->language->get('error_warning');
-        }
-        $this->response->addHeader('Content-Type: application/json');
-        $this->response->setOutput(json_encode($json));
-    }
+            $foxpost_datas = $query->rows;
 
-    public function export($export, $size) {
-        $json = [];
-        if (!$this->user->hasPermission('access', 'sale/order')) {
-            $this->load->language('error/permission');
-            $json['error']['permission'] = $this->language->get('heading_title');
+            print "<pre>";
+            print_r($foxpost_datas);
+            exit;
         }
-        $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
 
-        if (!$json) {
-
-            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "rausch_foxpost_order WHERE rausch_foxpost_order_id IN(" . $export . ')');
+        // EXPORT
+        elseif (isset($get['export'])) {
+            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "rausch_foxpost_order WHERE rausch_foxpost_order_id IN(" . $get['export'] . ')');
             $temp = $query->rows;
 
             $ids = [];
@@ -219,6 +209,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                     $order_data[$item['order_id']] = $item;
                 }
             }
+
             $headers = array(
                 "Címzett neve",
                 "Címzett telefonszáma",
@@ -277,7 +268,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                     }
                 }
 
-                $row_data[] = $foxpost_row['foxpost_size'] ? $foxpost_row['foxpost_size'] : strtoupper($size); // Csomag méret
+                $row_data[] = $foxpost_row['foxpost_size'] ? $foxpost_row['foxpost_size'] : strtoupper($get['size']); // Csomag méret
                 $row_data[] = str_replace("\n", " ", $order_row['comment']); // Futár információk
                 $row_data[] = ''; // Saját adatok
                 $row_data[] = ''; // Címkenyomtatás
@@ -291,24 +282,11 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $this->response->addHeader('Content-Type: text/csv');
             $this->response->addHeader('Content-Disposition: attachment; filename=foxpost_export.csv');
             $this->response->setOutput($out);
-            return;
         }
-        if (isset($json['error']) && !isset($json['error']['warning'])) {
-            $json['error']['warning'] = $this->language->get('error_warning');
-        }
-        $this->response->addHeader('Content-Type: application/json');
-        $this->response->setOutput(json_encode($json));
-    }
 
-    public function barcode($barcode, $pagesize) {
-        $json = [];
-        if (!$this->user->hasPermission('access', 'sale/order')) {
-            $this->load->language('error/permission');
-            $json['error']['permission'] = $this->language->get('heading_title');
-        }
-        $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
-        if (!$json) {
-            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "rausch_foxpost_order WHERE foxpost_barcode != '' AND rausch_foxpost_order_id IN(" . $barcode . ')');
+        // BARCODE
+        elseif (isset($get['barcode']) && isset($get['pagesize'])) {
+            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "rausch_foxpost_order WHERE foxpost_barcode != '' AND rausch_foxpost_order_id IN(" . $get['barcode'] . ')');
 
             $foxpost_datas = $query->rows;
 
@@ -319,33 +297,24 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 $data[] = $foxpost_data['foxpost_barcode'];
             }
 
-            $resp = $this->apicall('/api/label/' . $pagesize, 'POST', $data);
+            $resp = $this->apicall('/api/label/' . $get['pagesize'], 'POST', $data);
 
             $this->response->addHeader('Content-Type: application/pdf');
             $this->response->setOutput($resp['data']);
-            return;
         }
-        if (isset($json['error']) && !isset($json['error']['warning'])) {
-            $json['error']['warning'] = $this->language->get('error_warning');
-        }
-        $this->response->addHeader('Content-Type: application/json');
-        $this->response->setOutput(json_encode($json));
-    }
 
-    public function sync($sync) {
-        $json = [];
-        if (!$this->user->hasPermission('access', 'sale/order')) {
-            $this->load->language('error/permission');
-            $json['error']['permission'] = $this->language->get('heading_title');
-        }
-        $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
-        if (!$json) {
-            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "rausch_foxpost_order WHERE foxpost_barcode != '' AND rausch_foxpost_order_id IN(" . $sync . ')');
+        // SYNC
+        elseif (isset($get['sync'])) {
+
+            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "rausch_foxpost_order WHERE foxpost_barcode != '' AND rausch_foxpost_order_id IN(" . $get['sync'] . ')');
             $foxpost_datas = $query->rows;
+
             $data = [];
             $error = '';
+
             foreach ($foxpost_datas as $foxpost_data) {
                 $resp = $this->apicall('/api/tracking/' . $foxpost_data['foxpost_barcode']);
+                
                 if (isset($resp['code']) && $resp['code'] == 200) {
                     // OK
                 } elseif (isset($resp['code']) && $resp['code'] == 401) {
@@ -355,6 +324,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 } else {
                     $error = $this->language->get('error_api_unknow');
                 }
+
                 if ($error) {
                     break;
                 } else {
@@ -367,6 +337,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
 								order_id = " . round($foxpost_data['order_id']) . " AND
 								order_status_id != " . $sid
                         );
+
                         if ($this->db->countAffected()) {
                             $this->load->model('extension/rausch_foxpost/shipping/rausch_foxpost');
                             $this->model_extension_shipping_foxpost->addOrderHistory(
@@ -376,6 +347,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                             );
                         }
                     }
+
                     $query = $this->db->query("
 						UPDATE " . DB_PREFIX . "rausch_foxpost_order
 						SET
@@ -387,26 +359,23 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                     );
                 }
             }
-            if ($error) {
-                $json['error']['hiba'] = $error;
-            }
-        }
-        if (isset($json['error']) && !isset($json['error']['warning'])) {
-            $json['error']['warning'] = $this->language->get('error_warning');
-        }
-        $this->response->addHeader('Content-Type: application/json');
-        $this->response->setOutput(json_encode($json));
-    }
+            exit;
 
-    public function create($create) {
-        $json = [];
-        if (!$this->user->hasPermission('access', 'sale/order')) {
-            $this->load->language('error/permission');
-            $json['error']['permission'] = $this->language->get('heading_title');
+            if ($error) {
+                $data = array(
+                    'message' => $error
+                );
+                $this->response->addHeader('HTTP/1.1 400 Bad Request');
+            }
+
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($data));
         }
-        $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
-        if (!$json) {
-            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "rausch_foxpost_order WHERE rausch_foxpost_order_id = " . round($create));
+
+        // CREATE
+        elseif (isset($get['create'])) {
+
+            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "rausch_foxpost_order WHERE rausch_foxpost_order_id = " . round($get['create']));
             $foxpost_data = $query->row;
 
             $this->load->model('sale/order');
@@ -420,6 +389,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 $data['recipientAddress'] = (!empty($order_data['shipping_address_1'] . " " . $order_data['shipping_address_2'])) ? $order_data['shipping_address_1'] . " " . $order_data['shipping_address_2'] : $order_data['payment_address_1'] . " " . $order_data['payment_address_2'];
             } elseif ($foxpost_type == "transfercod") {
                 $data['cod'] = round($order_data['total']);
+
                 $data['recipientCity'] = (!empty($order_data['shipping_city'])) ? $order_data['shipping_city'] : $order_data['payment_city'];
                 $data['recipientZip'] = (!empty($order_data['shipping_postcode'])) ? $order_data['shipping_postcode'] : $order_data['payment_postcode'];
                 $data['recipientAddress'] = (!empty($order_data['shipping_address_1'] . " " . $order_data['shipping_address_2'])) ? $order_data['shipping_address_1'] . " " . $order_data['shipping_address_2'] : $order_data['payment_address_1'] . " " . $order_data['payment_address_2'];
@@ -427,22 +397,26 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 $foxpost_type = explode("_", $foxpost_type);
                 $foxpost_iscod = isset($foxpost_type[1]) ? $foxpost_type[1] : '';
                 $foxpost_type = $foxpost_type[0];
+
                 if ($foxpost_iscod == "cod") {
                     $data['cod'] = round($order_data['total']);
                 }
+
                 $data['destination'] = $foxpost_type;
             }
 
             $data['recipientEmail'] = $order_data['email'];
             $data['recipientPhone'] = $order_data['telephone'];
-            $data['recipientName'] = $order_data['shipping_lastname'] . " " . $order_data['shipping_firstname'];
+            $data['recipientName']  = $order_data['shipping_lastname'] . " " . $order_data['shipping_firstname'];
 
             $data['size'] = $get['size'];
             $data['source'] = "opencart4_rausch_" . $this->version;
 
             $error = '';
             $resp = $this->apicall('/api/parcel', 'POST', [$data]);
+
             $data = array();
+
             if (isset($resp['code']) && $resp['code'] == 201) {
                 // OK
             } elseif (isset($resp['code']) && $resp['code'] == 401) {
@@ -461,193 +435,149 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 }
             }
 
-
-            $data_temp = $data;
-            $data = [];
-
-            $query = $this->db->query("UPDATE " . DB_PREFIX . "rausch_foxpost_order SET foxpost_barcode = '" . $resp['data']['parcels'][0]['clFoxId'] . "', foxpost_size = '" . $resp['data']['parcels'][0]['size'] . "', date_modified = NOW() WHERE rausch_foxpost_order_id = " . round($get['create']));
-            $query = $this->db->query("UPDATE " . DB_PREFIX . "order SET tracking = '" . $resp['data']['parcels'][0]['clFoxId'] . "' WHERE order_id = " . round($foxpost_data['order_id']));
-
-            if ($this->config->get('shipping_rausch_foxpost_order_foxpost_status_id')) {
-                $comment = $this->language->get('text_foxpost_tracking') . ": https://foxpost.hu/csomagkovetes/?code=" . $resp['data']['parcels'][0]['clFoxId'];
-
-                $this->load->model('extension/rausch_foxpost/shipping/rausch_foxpost');
-                $this->model_extension_shipping_foxpost->addOrderHistory(
-                        round($foxpost_data['order_id']),
-                        $this->config->get('shipping_rausch_foxpost_order_foxpost_status_id'),
-                        $comment
-                );
-            }
-
-            $order_info = $order_data;
-
-            $language = new Language($order_info['language_code']);
-            $language->load($order_info['language_code']);
-            $language->load('extension/rausch_foxpost/shipping/rausch_foxpost');
-
-            $data['order_info'] = $order_info;
-
-            $order_info['date_added'] = date($language->get('date_format_short'), strtotime($order_info['date_added']));
-
-            $data['logo'] = $order_info['store_url'] . 'image/' . $this->config->get('config_logo');
-            $data['store_name'] = $order_info['store_name'];
-            $data['store_url'] = $order_info['store_url'];
-            $data['customer_id'] = $order_info['customer_id'];
-            $data['link'] = $order_info['store_url'] . 'index.php?route=account/order/info&order_id=' . $order_info['order_id'];
-
-            $data['title'] = sprintf($language->get('mail_foxpost_subject'), $order_info['store_name'], $order_info['order_id']);
-            $data['mail_foxpost_greeting'] = sprintf($language->get('mail_foxpost_greeting'), $order_info['store_name']);
-
-            $data['foxpost_data'] = $foxpost_data;
-
-            $data['foxpost_data']['foxpost_barcode'] = $resp['data']['parcels'][0]['clFoxId'];
-
-            if ($order_info['payment_address_format']) {
-                $format = $order_info['payment_address_format'];
-            } else {
-                $format = '{firstname} {lastname}' . "\n" . '{company}' . "\n" . '{address_1}' . "\n" . '{address_2}' . "\n" . '{city} {postcode}' . "\n" . '{zone}' . "\n" . '{country}';
-            }
-
-            $find = array(
-                '{firstname}',
-                '{lastname}',
-                '{company}',
-                '{address_1}',
-                '{address_2}',
-                '{city}',
-                '{postcode}',
-                '{zone}',
-                '{zone_code}',
-                '{country}'
-            );
-
-            $replace = array(
-                'firstname' => $order_info['payment_firstname'],
-                'lastname' => $order_info['payment_lastname'],
-                'company' => $order_info['payment_company'],
-                'address_1' => $order_info['payment_address_1'],
-                'address_2' => $order_info['payment_address_2'],
-                'city' => $order_info['payment_city'],
-                'postcode' => $order_info['payment_postcode'],
-                'zone' => $order_info['payment_zone'],
-                'zone_code' => $order_info['payment_zone_code'],
-                'country' => $order_info['payment_country']
-            );
-
-            $data['payment_address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim(str_replace($find, $replace, $format))));
-
-            if ($order_info['shipping_address_format']) {
-                $format = $order_info['shipping_address_format'];
-            } else {
-                $format = '{firstname} {lastname}' . "\n" . '{company}' . "\n" . '{address_1}' . "\n" . '{address_2}' . "\n" . '{city} {postcode}' . "\n" . '{zone}' . "\n" . '{country}';
-            }
-
-            $find = array(
-                '{firstname}',
-                '{lastname}',
-                '{company}',
-                '{address_1}',
-                '{address_2}',
-                '{city}',
-                '{postcode}',
-                '{zone}',
-                '{zone_code}',
-                '{country}'
-            );
-
-            $replace = array(
-                'firstname' => $order_info['shipping_firstname'],
-                'lastname' => $order_info['shipping_lastname'],
-                'company' => $order_info['shipping_company'],
-                'address_1' => $order_info['shipping_address_1'],
-                'address_2' => $order_info['shipping_address_2'],
-                'city' => $order_info['shipping_city'],
-                'postcode' => $order_info['shipping_postcode'],
-                'zone' => $order_info['shipping_zone'],
-                'zone_code' => $order_info['shipping_zone_code'],
-                'country' => $order_info['shipping_country']
-            );
-
-            $data['shipping_address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim(str_replace($find, $replace, $format))));
-
-            $mail = new Mail($this->config->get('config_mail_engine'));
-            $mail->parameter = $this->config->get('config_mail_parameter');
-            $mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
-            $mail->smtp_username = $this->config->get('config_mail_smtp_username');
-            $mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-            $mail->smtp_port = $this->config->get('config_mail_smtp_port');
-            $mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
-
-            $mail->setTo($order_data['email']);
-            $mail->setFrom($this->config->get('config_email'));
-            $mail->setSender(html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
-            $mail->setSubject(sprintf($this->language->get('mail_foxpost_subject'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'), $foxpost_data['order_id']));
-            $mail->setHtml($this->load->view('extension/rausch_foxpost/shipping/rausch_foxpost_mail', $data));
-            $mail->send();
-
-            $data = $data_temp;
-
             if ($error) {
-                $json['error']['hiba'] = $error;
+                $data = array(
+                    'message' => $error
+                );
+                $this->response->addHeader('HTTP/1.1 400 Bad Request');
             } else {
+                $data_temp = $data;
+                $data = [];
+
+                $query = $this->db->query("UPDATE " . DB_PREFIX . "rausch_foxpost_order SET foxpost_barcode = '" . $resp['data']['parcels'][0]['clFoxId'] . "', foxpost_size = '" . $resp['data']['parcels'][0]['size'] . "', date_modified = NOW() WHERE rausch_foxpost_order_id = " . round($get['create']));
+                $query = $this->db->query("UPDATE " . DB_PREFIX . "order SET tracking = '" . $resp['data']['parcels'][0]['clFoxId'] . "' WHERE order_id = " . round($foxpost_data['order_id']));
+
+                if ($this->config->get('shipping_rausch_foxpost_order_foxpost_status_id')) {
+                    $comment = $this->language->get('text_foxpost_tracking') . ": https://foxpost.hu/csomagkovetes/?code=" . $resp['data']['parcels'][0]['clFoxId'];
+
+                    $this->load->model('extension/rausch_foxpost/shipping/rausch_foxpost');
+                    $this->model_extension_shipping_foxpost->addOrderHistory(
+                            round($foxpost_data['order_id']),
+                            $this->config->get('shipping_rausch_foxpost_order_foxpost_status_id'),
+                            $comment
+                    );
+                }
+
+                $order_info = $order_data;
+
+                $language = new Language($order_info['language_code']);
+                $language->load($order_info['language_code']);
+                $language->load('extension/rausch_foxpost/shipping/rausch_foxpost');
+
+                $data['order_info'] = $order_info;
+
+                $order_info['date_added'] = date($language->get('date_format_short'), strtotime($order_info['date_added']));
+
+                $data['logo'] = $order_info['store_url'] . 'image/' . $this->config->get('config_logo');
+                $data['store_name'] = $order_info['store_name'];
+                $data['store_url'] = $order_info['store_url'];
+                $data['customer_id'] = $order_info['customer_id'];
+                $data['link'] = $order_info['store_url'] . 'index.php?route=account/order/info&order_id=' . $order_info['order_id'];
+
+                $data['title'] = sprintf($language->get('mail_foxpost_subject'), $order_info['store_name'], $order_info['order_id']);
+                $data['mail_foxpost_greeting'] = sprintf($language->get('mail_foxpost_greeting'), $order_info['store_name']);
+
+                $data['foxpost_data'] = $foxpost_data;
+
+                $data['foxpost_data']['foxpost_barcode'] = $resp['data']['parcels'][0]['clFoxId'];
+
+                if ($order_info['payment_address_format']) {
+                    $format = $order_info['payment_address_format'];
+                } else {
+                    $format = '{firstname} {lastname}' . "\n" . '{company}' . "\n" . '{address_1}' . "\n" . '{address_2}' . "\n" . '{city} {postcode}' . "\n" . '{zone}' . "\n" . '{country}';
+                }
+
+                $find = array(
+                    '{firstname}',
+                    '{lastname}',
+                    '{company}',
+                    '{address_1}',
+                    '{address_2}',
+                    '{city}',
+                    '{postcode}',
+                    '{zone}',
+                    '{zone_code}',
+                    '{country}'
+                );
+
+                $replace = array(
+                    'firstname' => $order_info['payment_firstname'],
+                    'lastname' => $order_info['payment_lastname'],
+                    'company' => $order_info['payment_company'],
+                    'address_1' => $order_info['payment_address_1'],
+                    'address_2' => $order_info['payment_address_2'],
+                    'city' => $order_info['payment_city'],
+                    'postcode' => $order_info['payment_postcode'],
+                    'zone' => $order_info['payment_zone'],
+                    'zone_code' => $order_info['payment_zone_code'],
+                    'country' => $order_info['payment_country']
+                );
+
+                $data['payment_address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim(str_replace($find, $replace, $format))));
+
+                if ($order_info['shipping_address_format']) {
+                    $format = $order_info['shipping_address_format'];
+                } else {
+                    $format = '{firstname} {lastname}' . "\n" . '{company}' . "\n" . '{address_1}' . "\n" . '{address_2}' . "\n" . '{city} {postcode}' . "\n" . '{zone}' . "\n" . '{country}';
+                }
+
+                $find = array(
+                    '{firstname}',
+                    '{lastname}',
+                    '{company}',
+                    '{address_1}',
+                    '{address_2}',
+                    '{city}',
+                    '{postcode}',
+                    '{zone}',
+                    '{zone_code}',
+                    '{country}'
+                );
+
+                $replace = array(
+                    'firstname' => $order_info['shipping_firstname'],
+                    'lastname' => $order_info['shipping_lastname'],
+                    'company' => $order_info['shipping_company'],
+                    'address_1' => $order_info['shipping_address_1'],
+                    'address_2' => $order_info['shipping_address_2'],
+                    'city' => $order_info['shipping_city'],
+                    'postcode' => $order_info['shipping_postcode'],
+                    'zone' => $order_info['shipping_zone'],
+                    'zone_code' => $order_info['shipping_zone_code'],
+                    'country' => $order_info['shipping_country']
+                );
+
+                $data['shipping_address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim(str_replace($find, $replace, $format))));
+
+                $mail = new Mail($this->config->get('config_mail_engine'));
+                $mail->parameter = $this->config->get('config_mail_parameter');
+                $mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
+                $mail->smtp_username = $this->config->get('config_mail_smtp_username');
+                $mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
+                $mail->smtp_port = $this->config->get('config_mail_smtp_port');
+                $mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
+
+                $mail->setTo($order_data['email']);
+                $mail->setFrom($this->config->get('config_email'));
+                $mail->setSender(html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
+                $mail->setSubject(sprintf($this->language->get('mail_foxpost_subject'), html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'), $foxpost_data['order_id']));
+                $mail->setHtml($this->load->view('extension/rausch_foxpost/shipping/rausch_foxpost_mail', $data));
+                $mail->send();
+
+                $data = $data_temp;
+
                 $this->response->redirect($this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&sync=' . $foxpost_data['foxpost_order_id'], true));
             }
-        }
-        if (isset($json['error']) && !isset($json['error']['warning'])) {
-            $json['error']['warning'] = $this->language->get('error_warning');
-        }
-        $this->response->addHeader('Content-Type: application/json');
-        $this->response->setOutput(json_encode($json));
-    }
 
-    public function orders() {
-        $get = $this->request->get;
-        // TEST
+            // $data['data'] = $resp;
 
-        if (isset($get['test'])) {
-            $this->test();
-            exit;
-        }
-        if (!$this->user->hasPermission('access', 'sale/order')) {
-            $this->load->language('error/permission');
-            $this->document->setTitle($this->language->get('heading_title'));
-
-            $data['header'] = $this->load->controller('common/header');
-            $data['column_left'] = $this->load->controller('common/column_left');
-            $data['footer'] = $this->load->controller('common/footer');
-
-            $this->response->setOutput($this->load->view('error/permission', $data));
-
-            return;
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($data));
         }
 
-        $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
-        $this->document->setTitle($this->language->get('heading_title'));
+        // LIST
+        else {
 
-        // MIGRATE
-
-        if (isset($get['migrate'])) {
-            $this->migrate();
-        }
-
-        // EXPORT
-        elseif (isset($get['export'])) {
-            $this->export($get['export'], $get['size']);
-        }
-
-        // BARCODE
-        elseif (isset($get['barcode']) && isset($get['pagesize'])) {
-            $this->barcode($get['barcode'], $get['pagesize']);
-        }
-
-        // SYNC
-        elseif (isset($get['sync'])) {
-            $this->sync($get['sync']);
-        }
-        // CREATE
-        elseif (isset($get['create'])) {
-            $this->create($get['create']);
-        } else {
             $data['link_base'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'], true);
             $data['link_archive'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&filter=archive', true);
 
@@ -663,7 +593,9 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             } else {
                 $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "rausch_foxpost_order WHERE foxpost_status NOT IN ('RECIEVE', 'HDRECIEVE', 'HDRETURN', 'INWAREHOUSE', 'COLLECTSENT') ORDER BY " . $orderby . " " . $orderbysub);
             }
+
             $data['data'] = $query->rows;
+
             foreach ($data['data'] as &$item) {
                 $item['link_sync'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&sync=' . $item['rausch_foxpost_order_id'], true);
                 $item['link_barcode'] = $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'] . '&barcode=' . $item['rausch_foxpost_order_id'], true);
@@ -681,7 +613,9 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 } else {
                     $foxpost_type = explode("_", $foxpost_type);
                     $foxpost_iscod = isset($foxpost_type[1]) ? $foxpost_type[1] : '';
+
                     $item['foxpost_type'] = $foxpost_type[0];
+
                     if ($foxpost_iscod == "cod") {
                         $item['foxpost_cod'] = true;
                     } else {
@@ -719,17 +653,21 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 $data['apms'][$apm['operator_id']] = $apm['name'];
             }
             unset($temp);
+
             $this->response->setOutput($this->load->view('extension/rausch_foxpost/shipping/rausch_foxpost_orders', $data));
         }
     }
 
     // API CALL
+
     protected function apicall($path, $method = 'GET', $request_data = array(), $query = array()) {
         $base_url = ($this->config->get('shipping_rausch_foxpost_test')) ? "https://webapi-test.foxpost.hu" : "https://webapi.foxpost.hu";
         $query = ($this->config->get('shipping_rausch_foxpost_test')) ? array_merge($query, array('isWeb' => false)) : $query;
         $url = $base_url . $path . ($query ? '?' . http_build_query($query) : '');
+        
         $code = '';
         $headers = [];
+
         $username = $this->config->get('shipping_rausch_foxpost_username');
         $password = $this->config->get('shipping_rausch_foxpost_password');
         $key = $this->config->get('shipping_rausch_foxpost_key');
@@ -748,17 +686,22 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
         $response = curl_exec($ch);
+
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $header = substr($response, 0, curl_getinfo($ch, CURLINFO_HEADER_SIZE));
         $data = substr($response, curl_getinfo($ch, CURLINFO_HEADER_SIZE));
         $header = explode("\n", $header);
+
         foreach ($header as &$header_item) {
             $header_item = trim($header_item);
         }
+
         if (in_array("Content-Type: application/json", $header) || in_array("Content-Type: application/json;charset=ISO-8859-1", $header)) {
             $data = json_decode($data, true);
         }
+
         curl_close($ch);
         file_put_contents('apicall.txt', var_export($data, true) . PHP_EOL, FILE_APPEND);
         return array(
@@ -779,10 +722,11 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         $this->load->model('setting/event');
         $this->load->model('extension/rausch_foxpost/shipping/rausch_foxpost');
         $this->model_extension_rausch_foxpost_shipping_rausch_foxpost->install();
+        
         // Remove Event
         $this->model_setting_event->deleteEventByCode('rausch_foxpost_adminmenu');
         $this->model_setting_event->deleteEventByCode('rausch_shipping_foxpost');
-
+        
         // Add Event
         if (VERSION >= '4.0.2.0') {
             $this->model_setting_event->addEvent([
@@ -822,6 +766,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $this->model_setting_event->addEvent('rausch_foxpost_adminmenu', 'Admin Menu', 'admin/view/common/column_left/before', 'extension/rausch_foxpost/shipping/rausch_foxpost|AddtoAdminMenu', 1, 0);
             $this->model_setting_event->addEvent('rausch_shipping_foxpost', 'Rausch Foxpost', 'catalog/model/checkout/order/addHistory/after', 'extension/rausch_foxpost/shipping/rausch_foxpost|addOrder');
         }
+        
         // Permission
         $this->load->model('user/user_group');
         $this->model_user_user_group->removePermission($this->user->getGroupId(), 'access', 'extension/rausch_foxpost/shipping/rausch_foxpost');
@@ -840,37 +785,37 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $this->load->model('user/user_group');
             $this->model_user_user_group->removePermission($this->user->getGroupId(), 'access', 'extension/rausch_foxpost/shipping/rausch_foxpost');
             $this->model_user_user_group->removePermission($this->user->getGroupId(), 'modify', 'extension/rausch_foxpost/shipping/rausch_foxpost');
-
+            
             $this->load->model('setting/event');
             // Remove Event
             $this->model_setting_event->deleteEventByCode('rausch_foxpost_adminmenu');
             $this->model_setting_event->deleteEventByCode('rausch_shipping_foxpost');
         }
     }
-
+    
     /**
      * 
      * @param type $route
      * @param array $data
      */
-    public function AddtoAdminMenu(&$route, &$data) {
-
-        if ($this->user->hasPermission('access', 'extension/rausch_foxpost/shipping/rausch_foxpost')) {
+    public function AddtoAdminMenu(&$route, &$data){
+        
+        if ($this->user->hasPermission('access', 'extension/rausch_foxpost/shipping/rausch_foxpost')) {  
             $uj_menu = array();
             $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
             $link = [];
             $link[] = [
-                'name' => $this->language->get('text_list'),
-                'href' => $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost', 'user_token=' . $this->session->data['user_token'], true),
-                'children' => []
+                    'name'      => $this->language->get('text_list'),
+                    'href'      => $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost', 'user_token=' . $this->session->data['user_token'], true),
+                    'children'  => []
             ];
             $link[] = [
-                'name' => $this->language->get('text_orderlist'),
-                'href' => $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'], true),
-                'children' => []
+                    'name'      => $this->language->get('text_orderlist'),
+                    'href'      => $this->url->link('extension/rausch_foxpost/shipping/rausch_foxpost.orders', 'user_token=' . $this->session->data['user_token'], true),
+                    'children'  => []
             ];
 
-            foreach ($data['menus'] as $key => $menu) {
+            foreach ($data['menus'] as $key => $menu) {             
                 $uj_menu[] = $menu;
                 if ($key == 0) {
                     $uj_menu[] = [
