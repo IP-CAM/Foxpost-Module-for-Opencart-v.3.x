@@ -187,4 +187,9 @@ class RauschFoxpost extends \Opencart\System\Engine\Model {
         }
         return false;
     }
+    public function getOrder($order_id) {
+        $order_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order` WHERE `order_id` = '" . (int)$order_id . "'");
+        return $order_query->row;
+    }
+    
 }
