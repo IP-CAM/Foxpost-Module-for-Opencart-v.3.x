@@ -14,7 +14,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $shipping_code = explode(".", $szallitas->code);
             if ($shipping_code[0] == "rausch_foxpost") {
                 $this->db->query("INSERT INTO " . DB_PREFIX . "rausch_foxpost_order SET
-                order_id = '" . (int)$sdata['order_id'] . "', 
+                order_id = '" . (int)$oder_id . "', 
                 foxpost_type = '" . $this->db->escape($szallitas->code) . "',
                 date_added = NOW()");
             }
