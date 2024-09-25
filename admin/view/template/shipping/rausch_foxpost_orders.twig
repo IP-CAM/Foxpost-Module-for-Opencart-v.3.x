@@ -1,7 +1,15 @@
 {{ header }}{{ column_left }}
-
 <div id="content">
-
+    <div class="page-header">
+        <div class="container-fluid">
+            <h1>{{ heading_title }}</h1>
+            <ol class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                    {% endfor %}
+            </ol>
+        </div>
+    </div>
     <div class="page-header">
         <div class="container-fluid">
             <div class="pull-right">
@@ -12,7 +20,7 @@
                     </a>
 
                     <div class="btn-group">
-                        <a data-toggle="dropdown" class="btn btn-primary dropdown-toggle" >
+                        <a data-bs-toggle="dropdown" class="btn btn-primary dropdown-toggle" >
                             <i class="fa fa-fw fa-barcode"></i>
                             {{ text_get_barcode }}
                             <i class="fa fa-fw fa-caret-down"></i>
@@ -26,7 +34,7 @@
                     </div>
 
                     <div class="btn-group">
-                        <a data-toggle="dropdown" class="btn btn-primary dropdown-toggle" >
+                        <a data-bs-toggle="dropdown" class="btn btn-primary dropdown-toggle" >
                             <i class="fa fa-fw fa-file-excel-o"></i>
                             {{ text_export_selected }}
                             <i class="fa fa-fw fa-caret-down"></i>
@@ -46,7 +54,7 @@
                     </a>
                 {% else %}
                     <div class="btn-group">
-                        <a data-toggle="dropdown" class="btn btn-primary dropdown-toggle" >
+                        <a data-bs-toggle="dropdown" class="btn btn-primary dropdown-toggle" >
                             <i class="fa fa-fw fa-file-excel-o"></i>
                             {{ text_export_selected }}
                             <i class="fa fa-fw fa-caret-down"></i>
@@ -67,12 +75,6 @@
                 {% endif %}
 
             </div>
-            <h1>{{ heading_title }}</h1>
-            <ul class="breadcrumb">
-                {% for breadcrumb in breadcrumbs %}
-                    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
-                    {% endfor %}
-            </ul>
         </div>
     </div>
 
@@ -157,7 +159,7 @@
                             {% for item in data %}
                                 <tr>
                                     <td>
-                                        <input type="checkbox" class="foxpost-selected" name="selected[]" value="{{ item['foxpost_order_id'] }}">
+                                        <input type="checkbox" class="foxpost-selected" name="selected[]" value="{{ item['rausch_foxpost_order_id'] }}">
                                     </td>
                                     <td class="text-center"><a href="{{ item['link_order'] }}">{{ item['order_id'] }}</a></td>
                                     <td class="text-center">
@@ -194,7 +196,7 @@
                                             {% if not item['foxpost_barcode'] %}
 
                                                 <div class="btn-group">
-                                                    <a data-toggle="dropdown" class="btn btn-sm btn-primary dropdown-toggle">
+                                                    <a data-bs-toggle="dropdown" class="btn btn-sm btn-primary dropdown-toggle">
                                                         <i class="fa fa-fw fa-upload"></i>
                                                         {{ text_create }}
                                                         <i class="fa fa-fw fa-caret-down"></i>
@@ -211,7 +213,7 @@
                                             {% else %}
 
                                                 <div class="btn-group">
-                                                    <a data-toggle="dropdown" class="btn btn-sm btn-primary dropdown-toggle">
+                                                    <a data-bs-toggle="dropdown" class="btn btn-sm btn-primary dropdown-toggle">
                                                         <i class="fa fa-fw fa-barcode"></i>
                                                         {{ text_barcode }}
                                                         <i class="fa fa-fw fa-caret-down"></i>
@@ -244,11 +246,8 @@
 </div>
 
 {% block javascripts %}
-
     <script type="text/javascript">
-
         // Row actions
-
         $('a[data-link]').on('click', function () {
             $.ajax({
                 url: $(this).data('link')
@@ -260,10 +259,8 @@
                         alert(data.responseJSON.message);
                         location.reload();
                     })
-
             return false;
-        })
-
+        });
         // Barcode
 
         $('.foxpost-barcode-selected').on('click', function () {
@@ -273,7 +270,7 @@
                 ids.push(this.value);
             });
 
-                if (ids.length) {
+            if (ids.length) {
                 let url = "{{ link_base|replace({'&amp;': '&'}) }}&pagesize=" + $(this).data('pagesize') + "&barcode=" + ids.join(',');
                 window.open(url, '_blank');
             }
@@ -281,8 +278,7 @@
             location.reload();
 
             return false;
-        })
-
+        });
         // Export
 
         $('.foxpost-export-selected').on('click', function () {
@@ -293,7 +289,7 @@
                 ids.push(this.value);
             });
 
-                if (ids.length) {
+            if (ids.length) {
                 let url = "{{ link_base|replace({'&amp;': '&'}) }}&size=" + size + "&export=" + ids.join(',');
                 window.open(url, '_blank');
             }
@@ -301,10 +297,8 @@
             location.reload();
 
             return false;
-        })
-
+        });
         // Sync
-
         $('#foxpost-sync-selected').on('click', function () {
             let ids = [];
 
@@ -313,7 +307,7 @@
             });
 
             if (ids.length) {
-                    $.ajax({
+                $.ajax({
                     url: "{{ link_base|replace({'&amp;': '&'}) }}&sync=" + ids.join(',')
                 })
                         .done(function (data) {
@@ -323,10 +317,8 @@
                             alert(data.responseJSON.message);
                         })
             }
-
             return false;
-        })
-
+        });
     </script>
 
 {% endblock %}
