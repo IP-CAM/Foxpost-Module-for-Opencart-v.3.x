@@ -5,10 +5,11 @@ namespace Opencart\Catalog\Controller\Extension\RauschFoxpost\Shipping;
 class RauschFoxpost extends \Opencart\System\Engine\Controller {
 
     public function addOrder($route, &$data, &$output) {
-
+        $oder_id = $data[0];
         $sdata = $this->session->data;
-        
-        if (isset($sdata['order_id'])) {
+        $this->load->model('extension/rausch_foxpost/shipping/rausch_foxpost');
+        $van_mar = $this->model_extension_rausch_foxpost_shipping_rausch_foxpost->getFoxpostId($oder_id);
+        if ($oder_id && ! $van_mar) {
             $shipping_code = explode(".", $sdata['shipping_method']['code']);
             if ($shipping_code[0] == "rausch_foxpost") {
                 $this->db->query("INSERT INTO " . DB_PREFIX . "rausch_foxpost_order SET
