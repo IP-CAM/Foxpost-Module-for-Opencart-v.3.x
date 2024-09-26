@@ -703,7 +703,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         }
 
         curl_close($ch);
-        file_put_contents('apicall.txt', var_export($data, true) . PHP_EOL, FILE_APPEND);
+        
         return array(
             'code' => $code,
             'header' => $header,
