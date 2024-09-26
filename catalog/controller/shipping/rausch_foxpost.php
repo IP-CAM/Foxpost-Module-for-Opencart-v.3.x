@@ -20,4 +20,14 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             }
         }
     }
+    
+    public function validateTelephone(&$route, &$data, &$output) {
+        if (isset($this->request->post['telephone'])) {
+            $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
+            $telephone = $this->request->post['telephone'];
+            if ((utf8_strlen($telephone) < 10) || !preg_match('/^\+[1-9]{1}[0-9]{3,14}$/', $telephone)) {
+                $this->error['telephone'] = $this->language->get('error_phone') ;
+            }
+        }
+    }
 }

@@ -726,12 +726,13 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         // Remove Event
         $this->model_setting_event->deleteEventByCode('rausch_foxpost_adminmenu');
         $this->model_setting_event->deleteEventByCode('rausch_shipping_foxpost');
+        $this->model_setting_event->deleteEventByCode('rausch_shipping_foxpost_telephone_mask');
         
         // Add Event
         if (VERSION >= '4.0.2.0') {
             $this->model_setting_event->addEvent([
                 'code' => 'rausch_foxpost_adminmenu',
-                'description' => 'Admin Menu',
+                'description' => 'Rausch Foxpost Admin Menu',
                 'trigger' => 'admin/view/common/column_left/before',
                 'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost.AddtoAdminMenu',
                 'status' => 1,
@@ -745,10 +746,18 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 'status' => 1,
                 'sort_order' => 0
             ]);
+            $this->model_setting_event->addEvent([
+                'code' => 'rausch_shipping_foxpost_telephone_mask',
+                'description' => 'Rausch Foxpost Telefon Mask',
+                'trigger' => 'catalog/controller/account/register/validate/before',
+                'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost.validateTelephone',
+                'status' => 1,
+                'sort_order' => 0
+            ]);
         } elseif (VERSION >= '4.0.1.0') {
             $this->model_setting_event->addEvent([
                 'code' => 'rausch_foxpost_adminmenu',
-                'description' => 'Addon - Showmenu',
+                'description' => 'Rausch Foxpost Admin Menu',
                 'trigger' => 'admin/view/common/column_left/before',
                 'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost|AddtoAdminMenu',
                 'status' => 1,
@@ -762,10 +771,20 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
                 'status' => 1,
                 'sort_order' => 0
             ]);
+            $this->model_setting_event->addEvent([
+                'code' => 'rausch_shipping_foxpost_telephone_mask',
+                'description' => 'Rausch Foxpost Telefon Mask',
+                'trigger' => 'catalog/controller/account/register/validate/before',
+                'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost|validateTelephone',
+                'status' => 1,
+                'sort_order' => 0
+            ]);
         } else {
-            $this->model_setting_event->addEvent('rausch_foxpost_adminmenu', 'Admin Menu', 'admin/view/common/column_left/before', 'extension/rausch_foxpost/shipping/rausch_foxpost|AddtoAdminMenu', 1, 0);
+            $this->model_setting_event->addEvent('rausch_foxpost_adminmenu', 'Rausch Foxpost Admin Menu', 'admin/view/common/column_left/before', 'extension/rausch_foxpost/shipping/rausch_foxpost|AddtoAdminMenu', 1, 0);
             $this->model_setting_event->addEvent('rausch_shipping_foxpost', 'Rausch Foxpost', 'catalog/model/checkout/order/addHistory/after', 'extension/rausch_foxpost/shipping/rausch_foxpost|addOrder');
+            $this->model_setting_event->addEvent('rausch_shipping_foxpost_telephone_mask', 'catalog/controller/account/register/validate/before', 'extension/rausch_foxpost/shipping/rausch_foxpost|validateTelephone');
         }
+            
         
         // Permission
         $this->load->model('user/user_group');
@@ -790,6 +809,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             // Remove Event
             $this->model_setting_event->deleteEventByCode('rausch_foxpost_adminmenu');
             $this->model_setting_event->deleteEventByCode('rausch_shipping_foxpost');
+            $this->model_setting_event->deleteEventByCode('rausch_shipping_foxpost_telephone_mask');
         }
     }
     

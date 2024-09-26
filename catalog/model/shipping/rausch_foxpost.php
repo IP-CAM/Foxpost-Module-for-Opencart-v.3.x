@@ -5,7 +5,6 @@ namespace Opencart\Catalog\Model\Extension\RauschFoxpost\Shipping;
 class RauschFoxpost extends \Opencart\System\Engine\Model {
 
     public function getQuote($address) {
-
         $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
 
         $currency = $this->model_localisation_currency->getCurrencyByCode($this->session->data['currency']);
@@ -90,6 +89,8 @@ class RauschFoxpost extends \Opencart\System\Engine\Model {
             $error = $this->language->get('error_currency');
         } elseif ($address['iso_code_2'] != 'HU') {
             $error = $this->language->get('error_country');
+        } elseif (!$this->config->get('config_telephone_display') && ! $this->config->get('config_telephone_required')) {
+            $error = $this->language->get('error_telefone');
         } else {
 
             if (in_array('transfer', $this->config->get('shipping_rausch_foxpost_service'))) {
