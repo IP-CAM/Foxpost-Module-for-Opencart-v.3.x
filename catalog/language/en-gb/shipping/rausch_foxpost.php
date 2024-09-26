@@ -10,4 +10,4 @@ $_['text_free']                                = 'Free!';
 $_['error_country']                            = 'Invalid country!';
 $_['error_currency']                           = 'Invalid currency!';
 $_['error_service']                            = 'No service available!';
-$_['error_phone']                              = 'Please provide a valid international format phone number!';
+$_['error_phone']                              = 'Please provide a valid international format phone number! (+36201234567)';

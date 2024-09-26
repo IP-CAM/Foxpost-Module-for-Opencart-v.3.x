@@ -10,4 +10,4 @@ $_['text_free']                                = 'Ingyenes!';
 $_['error_country']                            = 'Hibás ország!';
 $_['error_currency']                           = 'Hibás pénznem!';
 $_['error_service']                            = 'Nincs engedélyezve szállítási szolgáltatás!';
-$_['error_phone']                              = 'Kérjük, adjon meg érvényes nemzetközi formátumú telefonszámot!';
+$_['error_phone']                              = 'Kérjük, adjon meg érvényes nemzetközi formátumú telefonszámot! (+36201234567)';

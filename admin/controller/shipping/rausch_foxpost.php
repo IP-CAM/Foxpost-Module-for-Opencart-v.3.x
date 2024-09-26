@@ -749,7 +749,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $this->model_setting_event->addEvent([
                 'code' => 'rausch_shipping_foxpost_telephone_mask',
                 'description' => 'Rausch Foxpost Telefon Mask',
-                'trigger' => 'catalog/controller/account/register/save/before',
+                'trigger' => 'catalog/controller/account/register.save/before',
                 'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost.validateTelephone',
                 'status' => 1,
                 'sort_order' => 0
@@ -757,7 +757,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
             $this->model_setting_event->addEvent([
                 'code' => 'rausch_shipping_foxpost_telephone_mask',
                 'description' => 'Rausch Foxpost Telefon Mask',
-                'trigger' => 'catalog/controller/checkout/register/save/before',
+                'trigger' => 'catalog/controller/checkout/register.save/before',
                 'action' => 'extension/rausch_foxpost/shipping/rausch_foxpost.validateTelephoneCheckout',
                 'status' => 1,
                 'sort_order' => 0

@@ -21,29 +21,33 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         }
     }
     
-    public function validateTelephone(&$route, &$data, &$output) {
-        file_put_contents('validatetelephone.txt', var_export($data, true) . PHP_EOL, FILE_APPEND);
+    public function validateTelephone(&$route, &$data) {
         if (isset($this->request->post['telephone'])) {
             $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
             $telephone = $this->request->post['telephone'];
-            if ((utf8_strlen($telephone) < 10) || !preg_match('/^\+[1-9]{1}[0-9]{3,14}$/', $telephone)) {
+            if ((mb_strlen($telephone, 'UTF-8') < 10) || !preg_match('/^\+[1-9]{1}[0-9]{3,14}$/', $telephone)) {
                 $json = [];
                 $json['error']['telephone'] = $this->language->get('error_phone') ;
                 $this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
+                // Megszakítjuk a futást
+                $this->response->output();
+                exit(); 
             }
         }
     }
-    public function validateTelephoneCheckout(&$route, &$data, &$output) {
-        file_put_contents('validatetelephonecheckout.txt', var_export($data, true) . PHP_EOL, FILE_APPEND);
+    public function validateTelephoneCheckout(&$route, &$data) {
         if (isset($this->request->post['telephone'])) {
             $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
             $telephone = $this->request->post['telephone'];
-            if ((utf8_strlen($telephone) < 10) || !preg_match('/^\+[1-9]{1}[0-9]{3,14}$/', $telephone)) {
+            if ((mb_strlen($telephone, 'UTF-8') < 10) || !preg_match('/^\+[1-9]{1}[0-9]{3,14}$/', $telephone)) {
                 $json = [];
                 $json['error']['telephone'] = $this->language->get('error_phone') ;
                 $this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
+                // Megszakítjuk a futást
+                $this->response->output();
+                exit();
             }
         }
     }
