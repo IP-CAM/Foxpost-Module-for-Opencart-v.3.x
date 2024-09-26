@@ -22,6 +22,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
     }
     
     public function validateTelephone(&$route, &$data, &$output) {
+        file_put_contents('validatetelephone.txt', var_export($data, true) . PHP_EOL, FILE_APPEND);
         if (isset($this->request->post['telephone'])) {
             $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
             $telephone = $this->request->post['telephone'];
@@ -34,6 +35,7 @@ class RauschFoxpost extends \Opencart\System\Engine\Controller {
         }
     }
     public function validateTelephoneCheckout(&$route, &$data, &$output) {
+        file_put_contents('validatetelephonecheckout.txt', var_export($data, true) . PHP_EOL, FILE_APPEND);
         if (isset($this->request->post['telephone'])) {
             $this->load->language('extension/rausch_foxpost/shipping/rausch_foxpost');
             $telephone = $this->request->post['telephone'];
